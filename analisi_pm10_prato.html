@@ -257,6 +257,15 @@
   .pmm-nav-back { color: #8892a4; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; }
   .pmm-nav-back:hover { color: #e2e8f0; }
   .pmm-nav-spacer { height: 52px; }
+  .pmm-footer {
+    background: #111318; border-top: 1px solid #252d3d;
+    text-align: center; padding: 2rem;
+    color: #4a5568; font-size: 0.8rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin-top: 2rem;
+  }
+  .pmm-footer strong { color: #6366f1; }
+  .pmm-footer span { color: #4a5568; margin-top: 0.25rem; display: block; }
 </style>
 </head>
 <body>
@@ -264,7 +273,7 @@
   <a class="pmm-nav-brand" href="index.html">#PratoMiMuovo</a>
   <a class="pmm-nav-back" href="index.html">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-    Torna all'archivio
+    Torna alla homepage
   </a>
 </nav>
 <div class="pmm-nav-spacer"></div>
@@ -966,5 +975,9 @@ new Chart(document.getElementById('saharaChart'), {
     }
 });
 </script>
+<footer class="pmm-footer">
+  <p><strong>#PratoMiMuovo</strong> — Mobilità intelligente per una città che funziona<br/>
+  <span>Progetto indipendente · Prato · 2026 · Matteo Tempestini</span></p>
+</footer>
 </body>
 </html>
