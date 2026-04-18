@@ -3,7 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>#PratoMiMuovo — Archivio del Progetto</title>
+  <title>#PratoMiMuovo — Mobilità intelligente per Prato</title>
+
+  <!-- Open Graph / Social sharing -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://iltempe.github.io/pratomimuovo/" />
+  <meta property="og:title"       content="#PratoMiMuovo — Mobilità intelligente per Prato" />
+  <meta property="og:description" content="Un progetto di innovazione civica per trasformare la mobilità urbana di Prato — semafori adattivi, sensori IoT, dati aperti." />
+  <meta property="og:image"       content="https://iltempe.github.io/pratomimuovo/logo-og.png" />
+  <meta property="og:image:width"  content="1080" />
+  <meta property="og:image:height" content="1080" />
+  <meta property="og:locale"      content="it_IT" />
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="#PratoMiMuovo — Mobilità intelligente per Prato" />
+  <meta name="twitter:description" content="Un progetto di innovazione civica per trasformare la mobilità urbana di Prato — semafori adattivi, sensori IoT, dati aperti." />
+  <meta name="twitter:image"       content="https://iltempe.github.io/pratomimuovo/logo-og.png" />
+  <meta name="description"         content="Un progetto di innovazione civica per trasformare la mobilità urbana di Prato — semafori adattivi, sensori IoT, dati aperti." />
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
   <style>
     :root {
@@ -307,6 +323,54 @@
     .arch-chart-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
     .arch-chart-card .sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; }
 
+    /* ── LOGO NAV ── */
+    .nav-logo { height: 30px; vertical-align: middle; margin-right: 0.5rem; }
+
+    /* ── AMBASCIATORE ── */
+    .ambassador-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem; align-items: start;
+    }
+    @media (max-width: 768px) { .ambassador-wrap { grid-template-columns: 1fr; } }
+
+    .ambassador-preview {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 1.25rem; text-align: center;
+    }
+    .ambassador-logo { width: 160px; height: auto; }
+    .ambassador-preview-text strong {
+      display: block; font-size: 1.1rem; font-weight: 700;
+      color: var(--accent); margin-bottom: 0.4rem;
+    }
+    .ambassador-preview-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+    .ambassador-preview-text .url {
+      display: inline-block; margin-top: 0.6rem;
+      font-size: 0.75rem; color: var(--accent2);
+      font-family: monospace;
+    }
+
+    .share-grid {
+      display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .share-btn {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.85rem 1.25rem; border-radius: 10px;
+      text-decoration: none; font-size: 0.9rem; font-weight: 600;
+      border: 1px solid transparent; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .share-btn:hover { opacity: 0.85; transform: translateX(3px); }
+    .share-btn svg { flex-shrink: 0; }
+    .share-facebook { background: rgba(24,119,242,0.15); border-color: rgba(24,119,242,0.35); color: #60a5fa; }
+    .share-linkedin { background: rgba(10,102,194,0.15); border-color: rgba(10,102,194,0.35); color: #93c5fd; }
+    .share-twitter  { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: var(--text); }
+    .share-whatsapp { background: rgba(37,211,102,0.12); border-color: rgba(37,211,102,0.3); color: #4ade80; }
+    .share-copy     { background: var(--bg3); border-color: var(--border); color: var(--text-muted); font-family: inherit; }
+    .share-copy.copied { border-color: var(--green); color: var(--green); }
+
     /* ── SCROLLBAR ── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -317,7 +381,10 @@
 
 <!-- NAV -->
 <nav>
-  <a class="nav-brand" href="#hero">#PratoMiMuovo</a>
+  <a class="nav-brand" href="#hero">
+    <img src="logo.png" alt="#PratoMiMuovo" class="nav-logo" />
+    #PratoMiMuovo
+  </a>
   <ul class="nav-links">
     <li><a href="#progetto">Progetto</a></li>
     <li><a href="#documenti">Documenti</a></li>
@@ -325,6 +392,7 @@
     <li><a href="#architettura">Architettura</a></li>
     <li><a href="#comunicazione">Comunicazione</a></li>
     <li><a href="#chisono">Chi sono</a></li>
+    <li><a href="#ambasciatore" style="color:var(--accent2);">Condividi</a></li>
   </ul>
 </nav>
 
@@ -807,6 +875,75 @@
   </div>
 </section>
 
+<!-- DIVENTA AMBASCIATORE -->
+<section id="ambasciatore">
+  <div class="section-label">Condividi</div>
+  <h2>Diventa ambasciatore</h2>
+  <p class="section-desc">Credi in una mobilità più intelligente per Prato? Condividi il progetto e aiuta a far crescere la comunità.</p>
+
+  <div class="ambassador-wrap">
+
+    <!-- Anteprima link social -->
+    <div class="ambassador-preview">
+      <img src="logo.png" alt="#PratoMiMuovo logo" class="ambassador-logo" />
+      <div class="ambassador-preview-text">
+        <strong>#PratoMiMuovo</strong>
+        <p>Un progetto di innovazione civica per trasformare la mobilità urbana di Prato — semafori adattivi, sensori IoT, dati aperti.</p>
+        <span class="url">iltempe.github.io/pratomimuovo</span>
+      </div>
+    </div>
+
+    <!-- Bottoni di condivisione -->
+    <div class="share-grid">
+
+      <a class="share-btn share-facebook"
+         href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Filtempe.github.io%2Fpratomimuovo%2F"
+         target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+        </svg>
+        Condividi su Facebook
+      </a>
+
+      <a class="share-btn share-linkedin"
+         href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Filtempe.github.io%2Fpratomimuovo%2F"
+         target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+        </svg>
+        Condividi su LinkedIn
+      </a>
+
+      <a class="share-btn share-twitter"
+         href="https://twitter.com/intent/tweet?url=https%3A%2F%2Filtempe.github.io%2Fpratomimuovo%2F&text=%23PratoMiMuovo+%E2%80%94+Un+progetto+civico+per+la+mobilit%C3%A0+intelligente+di+Prato.+Semafori+adattivi%2C+sensori+IoT%2C+dati+aperti."
+         target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+        Condividi su X / Twitter
+      </a>
+
+      <a class="share-btn share-whatsapp"
+         href="https://api.whatsapp.com/send?text=%23PratoMiMuovo+%E2%80%94+Mobilit%C3%A0+intelligente+per+Prato.+Semafori+adattivi%2C+sensori+IoT%2C+dati+aperti.+https%3A%2F%2Filtempe.github.io%2Fpratomimuovo%2F"
+         target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.859L.054 23.178a.75.75 0 00.918.918l5.319-1.479A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.703 9.703 0 01-4.964-1.362l-.355-.212-3.683 1.023 1.023-3.683-.212-.355A9.703 9.703 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
+        </svg>
+        Condividi su WhatsApp
+      </a>
+
+      <button class="share-btn share-copy" id="btn-copy-link" onclick="copyProjectLink()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+        <span id="copy-label">Copia link</span>
+      </button>
+
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <p>
@@ -832,6 +969,18 @@
     document.getElementById('lightbox').classList.remove('open');
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  // Copia link progetto
+  function copyProjectLink() {
+    const url = 'https://iltempe.github.io/pratomimuovo/';
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.getElementById('btn-copy-link');
+      const lbl = document.getElementById('copy-label');
+      btn.classList.add('copied');
+      lbl.textContent = '✓ Link copiato!';
+      setTimeout(() => { btn.classList.remove('copied'); lbl.textContent = 'Copia link'; }, 2500);
+    });
+  }
 
   // Post accordion
   function togglePost(id) {
