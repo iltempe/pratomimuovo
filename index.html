@@ -304,6 +304,54 @@
     }
     footer strong { color: var(--accent); }
 
+    /* ── DIAGRAMMA ADATTIVO ── */
+    .obj-selector {
+      display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 2rem;
+    }
+    .obj-btn {
+      padding: 0.6rem 1.2rem; border-radius: 20px; border: 2px solid var(--border);
+      background: var(--card); color: var(--text-muted);
+      font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .obj-btn:hover { border-color: var(--accent); color: var(--text); }
+    .obj-btn.active { color: #fff; border-color: transparent; }
+
+    .flow-wrap {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0; position: relative;
+    }
+    @media (max-width: 768px) {
+      .flow-wrap { grid-template-columns: 1fr; gap: 0.5rem; }
+      .flow-arrow { display: none; }
+    }
+    .flow-step {
+      background: var(--card); border: 2px solid var(--border);
+      border-radius: 14px; padding: 1.4rem 1.2rem;
+      position: relative; transition: border-color 0.3s, box-shadow 0.3s;
+      margin: 0 0.5rem;
+    }
+    .flow-step.active {
+      box-shadow: 0 0 20px rgba(99,102,241,0.2);
+    }
+    .flow-step-num {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text-faint); margin-bottom: 0.6rem;
+    }
+    .flow-step-icon { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
+    .flow-step-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .flow-step-text { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+
+    .flow-connector {
+      display: flex; align-items: center; justify-content: center;
+      position: absolute; right: -18px; top: 50%; transform: translateY(-50%);
+      z-index: 2; width: 36px; height: 36px;
+      background: var(--bg2); border-radius: 50%; border: 2px solid var(--border);
+    }
+    .flow-connector svg { color: var(--text-faint); }
+
     /* ── ARCH CHARTS ── */
     .arch-hypothesis-note {
       background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);
@@ -543,43 +591,42 @@
 
 <!-- ARCHITETTURA -->
 <section id="architettura">
-  <div class="section-label">Diagrammi</div>
+  <div class="section-label">Come funziona</div>
   <h2>Architettura del sistema</h2>
-  <p class="section-desc">Diagrammi di architettura e sequenza. Clicca su un'immagine per ingrandirla.</p>
-  <div class="img-grid">
+  <p class="section-desc">Scegli un obiettivo di mobilità e scopri come il sistema reagisce in tempo reale — dalla rilevazione all'azione sul campo.</p>
 
-    <div class="img-card" onclick="openLightbox('arch_sistema.png')">
-      <img src="arch_sistema.png" alt="Architettura di sistema" />
-      <div class="img-card-label">
-        <strong>Architettura di sistema</strong>
-        Vista complessiva dell'architettura — sensori, IA centrale, attuatori e protocolli
-      </div>
+  <!-- Selettore obiettivi -->
+  <div class="obj-selector" id="objSelector"></div>
+
+  <!-- Flow diagram -->
+  <div class="flow-wrap" id="flowDiagram">
+    <div class="flow-step" id="step0">
+      <div class="flow-step-num">01 · Obiettivo</div>
+      <span class="flow-step-icon" id="s0icon">🎯</span>
+      <div class="flow-step-title" id="s0title">Obiettivo</div>
+      <div class="flow-step-text" id="s0text">Seleziona un obiettivo qui sopra per vedere come il sistema risponde.</div>
+      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
     </div>
-
-    <div class="img-card" onclick="openLightbox('seq_pedestrian_extension.png')">
-      <img src="seq_pedestrian_extension.png" alt="Pedestrian Extension" />
-      <div class="img-card-label">
-        <strong>Pedestrian Extension</strong>
-        Sequenza del prolungamento rosso per pedone ancora in attraversamento
-      </div>
+    <div class="flow-step" id="step1">
+      <div class="flow-step-num">02 · Percezione</div>
+      <span class="flow-step-icon" id="s1icon">📡</span>
+      <div class="flow-step-title" id="s1title">Sensori attivi</div>
+      <div class="flow-step-text" id="s1text">I sensori raccolgono dati in tempo reale dalla città.</div>
+      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
     </div>
-
-    <div class="img-card" onclick="openLightbox('seq_environmental_tm.png')">
-      <img src="seq_environmental_tm.png" alt="Environmental Traffic Management" />
-      <div class="img-card-label">
-        <strong>Environmental Traffic Management</strong>
-        Integrazione ARPAT per deviazione traffico in caso di picchi PM10/NO2
-      </div>
+    <div class="flow-step" id="step2">
+      <div class="flow-step-num">03 · Decisione</div>
+      <span class="flow-step-icon" id="s2icon">🧠</span>
+      <div class="flow-step-title" id="s2title">IA centrale</div>
+      <div class="flow-step-text" id="s2text">L'intelligenza artificiale elabora i dati e decide il comportamento ottimale.</div>
+      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
     </div>
-
-    <div class="img-card" onclick="openLightbox('seq_bus_priority.png')">
-      <img src="seq_bus_priority.png" alt="Bus Priority" />
-      <div class="img-card-label">
-        <strong>Bus Priority</strong>
-        Sequenza del sistema di priorità semaforica per autobus LAM
-      </div>
+    <div class="flow-step" id="step3">
+      <div class="flow-step-num">04 · Azione</div>
+      <span class="flow-step-icon" id="s3icon">⚡</span>
+      <div class="flow-step-title" id="s3title">Risultato</div>
+      <div class="flow-step-text" id="s3text">Il sistema agisce sulla città: semafori, segnaletica, informazioni.</div>
     </div>
-
   </div>
 
   <div class="arch-hypothesis-note" style="margin-top:2rem;">
@@ -987,6 +1034,80 @@
     const item = document.getElementById(id);
     item.classList.toggle('open');
   }
+
+  // ── DIAGRAMMA ADATTIVO ───────────────────────────────────────────────
+  const OBJECTIVES = [
+    {
+      id:'code', label:'🚗 Meno code', color:'#6366f1',
+      s0:{ icon:'🚗', title:'Obiettivo', text:'Ridurre i tempi di attesa agli incroci e smaltire le code nei punti critici della rete.' },
+      s1:{ icon:'📷', title:'Sensori attivi', text:'Telecamere di conteggio veicoli · Spire elettromagnetiche nell\'asfalto · Dati storici traffico ora per ora.' },
+      s2:{ icon:'🧠', title:'IA analizza', text:'Calcola la lunghezza delle code in tempo reale e ricalcola i cicli semaforici ogni 30 secondi per smaltire l\'ingorgo.' },
+      s3:{ icon:'🟢', title:'Risultato', text:'Verde prolungato sulla corsia congestionata · Ciclo adattivo per svuotare la coda · -20% tempi di attesa stimati.' },
+    },
+    {
+      id:'aria', label:'🌿 Aria più pulita', color:'#10b981',
+      s0:{ icon:'🌿', title:'Obiettivo', text:'Ridurre l\'esposizione dei cittadini a picchi di PM10 e NO₂ nelle zone urbane di Prato.' },
+      s1:{ icon:'🌡️', title:'Sensori attivi', text:'Centraline ARPAT PM10/NO₂ in tempo reale · Dati meteo e direzione vento · Rilevatori traffico pesante su assi principali.' },
+      s2:{ icon:'🧠', title:'IA analizza', text:'Soglia inquinante superata? Il sistema identifica le strade con più traffico pesante e calcola itinerari alternativi a basso impatto.' },
+      s3:{ icon:'🔀', title:'Risultato', text:'Traffico pesante deviato automaticamente · Segnaletica a messaggio variabile attivata · Avviso app cittadini · -15% esposizione PM10.' },
+    },
+    {
+      id:'bus', label:'🚌 Bus puntuali', color:'#06b6d4',
+      s0:{ icon:'🚌', title:'Obiettivo', text:'Ridurre i ritardi degli autobus LAM e rendere il trasporto pubblico più affidabile e competitivo.' },
+      s1:{ icon:'📍', title:'Sensori attivi', text:'GPS autobus LAM in tempo reale · Rilevatore di prossimità al semaforo · Orari pianificati vs orari effettivi.' },
+      s2:{ icon:'🧠', title:'IA analizza', text:'Bus in ritardo di oltre 2 minuti? Il sistema calcola quando arriverà all\'incrocio e prepara il verde in anticipo.' },
+      s3:{ icon:'🟢', title:'Risultato', text:'Verde anticipato all\'arrivo del bus · Ciclo esteso per permettere il transito completo · Bus in orario · +35% puntualità stimata.' },
+    },
+    {
+      id:'pedoni', label:'🚶 Pedoni sicuri', color:'#a855f7',
+      s0:{ icon:'🚶', title:'Obiettivo', text:'Aumentare la sicurezza dei pedoni e dei ciclisti agli attraversamenti — zero conflitti con i veicoli.' },
+      s1:{ icon:'📷', title:'Sensori attivi', text:'Telecamere con rilevamento presenza pedoni · Sensori biciclette · Pulsante attraversamento smart con feedback.' },
+      s2:{ icon:'🧠', title:'IA analizza', text:'Pedone ancora in attraversamento al cambio del semaforo? Il sistema estende automaticamente il verde pedonale senza aspettare il ciclo successivo.' },
+      s3:{ icon:'🛡️', title:'Risultato', text:'Rosso veicoli prolungato · Verde pedonale esteso · 4-5 secondi di anticipo per i ciclisti · Conflitti azzerati · -25% rischio incidenti.' },
+    },
+  ];
+
+  function setObj(id) {
+    const obj = OBJECTIVES.find(o => o.id === id);
+    if (!obj) return;
+
+    // Aggiorna bottoni
+    document.querySelectorAll('.obj-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.id === id);
+      b.style.background = b.dataset.id === id ? obj.color : '';
+    });
+
+    // Aggiorna steps
+    ['s0','s1','s2','s3'].forEach((k, i) => {
+      const d = obj[k];
+      document.getElementById(k+'icon').textContent = d.icon;
+      document.getElementById(k+'title').textContent = d.title;
+      document.getElementById(k+'text').textContent  = d.text;
+      const step = document.getElementById('step'+i);
+      step.classList.add('active');
+      step.style.borderColor = obj.color;
+      step.style.boxShadow = `0 0 18px ${obj.color}33`;
+    });
+
+    // Aggiorna connettori
+    document.querySelectorAll('.flow-connector').forEach(c => {
+      c.style.borderColor = obj.color;
+      c.style.color = obj.color;
+      c.querySelector('svg').style.stroke = obj.color;
+    });
+  }
+
+  // Init: crea bottoni
+  const sel = document.getElementById('objSelector');
+  OBJECTIVES.forEach(obj => {
+    const btn = document.createElement('button');
+    btn.className = 'obj-btn';
+    btn.dataset.id = obj.id;
+    btn.textContent = obj.label;
+    btn.onclick = () => setObj(obj.id);
+    sel.appendChild(btn);
+  });
+  setObj('code'); // default
 
   // ── GRAFICI ARCHITETTURALI (ipotesi) ──────────────────────────────────
   const darkTick  = '#8892a4';
