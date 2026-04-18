@@ -430,14 +430,14 @@
 <!-- NAV -->
 <nav>
   <a class="nav-brand" href="#hero">
-    <img src="logo.png" alt="#PratoMiMuovo" class="nav-logo" />
+    <img src="logo.svg" alt="#PratoMiMuovo" class="nav-logo" />
     #PratoMiMuovo
   </a>
   <ul class="nav-links">
     <li><a href="#progetto">Progetto</a></li>
+    <li><a href="#architettura">Come funziona</a></li>
     <li><a href="#documenti">Documenti</a></li>
     <li><a href="#dati">Dati</a></li>
-    <li><a href="#architettura">Architettura</a></li>
     <li><a href="#comunicazione">Comunicazione</a></li>
     <li><a href="#chisono">Chi sono</a></li>
     <li><a href="#ambasciatore" style="color:var(--accent2);">Condividi</a></li>
@@ -515,6 +515,72 @@
   </div>
 </section>
 
+<!-- ARCHITETTURA -->
+<section id="architettura">
+  <div class="section-label">Come funziona</div>
+  <h2>Architettura del sistema</h2>
+  <p class="section-desc">Scegli un obiettivo di mobilità e scopri come il sistema reagisce in tempo reale — dalla rilevazione all'azione sul campo.</p>
+
+  <!-- Selettore obiettivi -->
+  <div class="obj-selector" id="objSelector"></div>
+
+  <!-- Flow diagram -->
+  <div class="flow-wrap" id="flowDiagram">
+    <div class="flow-step" id="step0">
+      <div class="flow-step-num">01 · Obiettivo</div>
+      <span class="flow-step-icon" id="s0icon">🎯</span>
+      <div class="flow-step-title" id="s0title">Obiettivo</div>
+      <div class="flow-step-text" id="s0text">Seleziona un obiettivo qui sopra per vedere come il sistema risponde.</div>
+      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+    <div class="flow-step" id="step1">
+      <div class="flow-step-num">02 · Percezione</div>
+      <span class="flow-step-icon" id="s1icon">📡</span>
+      <div class="flow-step-title" id="s1title">Sensori attivi</div>
+      <div class="flow-step-text" id="s1text">I sensori raccolgono dati in tempo reale dalla città.</div>
+      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+    <div class="flow-step" id="step2">
+      <div class="flow-step-num">03 · Decisione</div>
+      <span class="flow-step-icon" id="s2icon">🧠</span>
+      <div class="flow-step-title" id="s2title">IA centrale</div>
+      <div class="flow-step-text" id="s2text">L'intelligenza artificiale elabora i dati e decide il comportamento ottimale.</div>
+      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+    <div class="flow-step" id="step3">
+      <div class="flow-step-num">04 · Azione</div>
+      <span class="flow-step-icon" id="s3icon">⚡</span>
+      <div class="flow-step-title" id="s3title">Risultato</div>
+      <div class="flow-step-text" id="s3text">Il sistema agisce sulla città: semafori, segnaletica, informazioni.</div>
+    </div>
+  </div>
+
+  <div class="arch-hypothesis-note" style="margin-top:2rem;">
+    ℹ️ I dati qui riportati sono <strong>proiezioni basate su stime</strong> da validare a valle di sperimentazioni reali sul territorio. I costi del progetto sono stimati sulla base dell'architettura di sistema proposta: possono variare in base alle soluzioni tecniche scelte, ma rimangono di gran lunga più bassi dei costi di qualunque grande opera infrastrutturale.
+  </div>
+  <div class="arch-charts-grid">
+
+    <div class="arch-chart-card">
+      <h4>Impatto stimato per funzionalità</h4>
+      <p class="sub">Riduzione % stimata rispetto a scenario base senza intervento</p>
+      <canvas id="chartImpatto" height="230"></canvas>
+    </div>
+
+    <div class="arch-chart-card">
+      <h4>Confronto costi — soluzioni di mobilità</h4>
+      <p class="sub">Costo indicativo in milioni di euro (scala logaritmica)</p>
+      <canvas id="chartCosti" height="230"></canvas>
+    </div>
+
+    <div class="arch-chart-card">
+      <h4>Allocazione budget stimata — Fase 1</h4>
+      <p class="sub">Distribuzione ipotetica del budget (~1.3 M€)</p>
+      <canvas id="chartBudget" height="230"></canvas>
+    </div>
+
+  </div>
+</section>
+
 <!-- DOCUMENTI -->
 <section id="documenti">
   <div class="section-label">Archivio</div>
@@ -585,72 +651,6 @@
       </div>
       <p>Versione ottimizzata dei grafici sulle ordinanze, pensata per l'embedding su Substack.</p>
     </a>
-
-  </div>
-</section>
-
-<!-- ARCHITETTURA -->
-<section id="architettura">
-  <div class="section-label">Come funziona</div>
-  <h2>Architettura del sistema</h2>
-  <p class="section-desc">Scegli un obiettivo di mobilità e scopri come il sistema reagisce in tempo reale — dalla rilevazione all'azione sul campo.</p>
-
-  <!-- Selettore obiettivi -->
-  <div class="obj-selector" id="objSelector"></div>
-
-  <!-- Flow diagram -->
-  <div class="flow-wrap" id="flowDiagram">
-    <div class="flow-step" id="step0">
-      <div class="flow-step-num">01 · Obiettivo</div>
-      <span class="flow-step-icon" id="s0icon">🎯</span>
-      <div class="flow-step-title" id="s0title">Obiettivo</div>
-      <div class="flow-step-text" id="s0text">Seleziona un obiettivo qui sopra per vedere come il sistema risponde.</div>
-      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-    </div>
-    <div class="flow-step" id="step1">
-      <div class="flow-step-num">02 · Percezione</div>
-      <span class="flow-step-icon" id="s1icon">📡</span>
-      <div class="flow-step-title" id="s1title">Sensori attivi</div>
-      <div class="flow-step-text" id="s1text">I sensori raccolgono dati in tempo reale dalla città.</div>
-      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-    </div>
-    <div class="flow-step" id="step2">
-      <div class="flow-step-num">03 · Decisione</div>
-      <span class="flow-step-icon" id="s2icon">🧠</span>
-      <div class="flow-step-title" id="s2title">IA centrale</div>
-      <div class="flow-step-text" id="s2text">L'intelligenza artificiale elabora i dati e decide il comportamento ottimale.</div>
-      <div class="flow-connector"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-    </div>
-    <div class="flow-step" id="step3">
-      <div class="flow-step-num">04 · Azione</div>
-      <span class="flow-step-icon" id="s3icon">⚡</span>
-      <div class="flow-step-title" id="s3title">Risultato</div>
-      <div class="flow-step-text" id="s3text">Il sistema agisce sulla città: semafori, segnaletica, informazioni.</div>
-    </div>
-  </div>
-
-  <div class="arch-hypothesis-note" style="margin-top:2rem;">
-    ⚠️ I grafici seguenti rappresentano <strong>ipotesi architetturali del progetto</strong> basate su stime e letteratura di traffic engineering. Non sono dati misurati: possono essere liberamente adattati in base alle esigenze specifiche e ai dati reali di Prato.
-  </div>
-  <div class="arch-charts-grid">
-
-    <div class="arch-chart-card">
-      <h4>Impatto stimato per funzionalità</h4>
-      <p class="sub">Riduzione % stimata rispetto a scenario base senza intervento</p>
-      <canvas id="chartImpatto" height="230"></canvas>
-    </div>
-
-    <div class="arch-chart-card">
-      <h4>Confronto costi — soluzioni di mobilità</h4>
-      <p class="sub">Costo indicativo in milioni di euro (scala logaritmica)</p>
-      <canvas id="chartCosti" height="230"></canvas>
-    </div>
-
-    <div class="arch-chart-card">
-      <h4>Allocazione budget stimata — Fase 1</h4>
-      <p class="sub">Distribuzione ipotetica del budget (~1.3 M€)</p>
-      <canvas id="chartBudget" height="230"></canvas>
-    </div>
 
   </div>
 </section>
@@ -932,7 +932,7 @@
 
     <!-- Anteprima link social -->
     <div class="ambassador-preview">
-      <img src="logo.png" alt="#PratoMiMuovo logo" class="ambassador-logo" />
+      <img src="logo.svg" alt="#PratoMiMuovo logo" class="ambassador-logo" />
       <div class="ambassador-preview-text">
         <strong>#PratoMiMuovo</strong>
         <p>Un progetto di innovazione civica per trasformare la mobilità urbana di Prato — semafori adattivi, sensori IoT, dati aperti.</p>

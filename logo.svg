@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 530">
+
+  <!-- HASHTAG # — verde -->
+  <rect x="52"  y="152" width="183" height="27" rx="7" fill="#3CB44A"/>
+  <rect x="52"  y="204" width="183" height="27" rx="7" fill="#3CB44A"/>
+  <!-- barre verticali leggermente inclinate -->
+  <polygon points="101,96  126,96  113,292  88,292"  fill="#3CB44A"/>
+  <polygon points="157,96  182,96  169,292  144,292" fill="#3CB44A"/>
+
+  <!-- M stilizzata — blu, con picchi in alto e incavo tra le gambe in basso -->
+  <path fill="#1769C0"
+    d="M 194,294
+       L 194,98
+       L 269,226
+       L 344,98
+       L 344,294
+       L 316,294
+       L 316,168
+       L 269,262
+       L 222,168
+       L 222,294
+       Z"/>
+
+  <!-- CRESCENTE arancione — spesso, avvolge il lato destro della M -->
+  <path fill="#F5922A"
+    d="M 344,84
+       C 490,124 494,284 326,314
+       C 432,292 450,134 344,84
+       Z"/>
+
+  <!-- TESTO PratoMiMuovo — centrato rispetto alla larghezza del simbolo -->
+  <text x="290" y="420"
+        text-anchor="middle"
+        font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif"
+        font-size="62"
+        font-weight="800"
+        letter-spacing="-1">
+    <tspan fill="#1769C0">Prato</tspan><tspan fill="#3CB44A">MiMuovo</tspan>
+  </text>
+
+</svg>
