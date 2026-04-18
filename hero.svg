@@ -1,0 +1,303 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" style="display:block;width:100%;height:auto">
+<defs>
+  <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="6" result="blur"/>
+    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+  </filter>
+  <filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+  </filter>
+  <filter id="glow-node" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="10" result="blur"/>
+    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+  </filter>
+  <radialGradient id="bg-grad" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#0d0f1a"/>
+    <stop offset="100%" stop-color="#060709"/>
+  </radialGradient>
+  <radialGradient id="node-grad-main" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#ffffff"/>
+    <stop offset="40%" stop-color="#a5b4fc"/>
+    <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="node-grad-cyan" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#ffffff"/>
+    <stop offset="40%" stop-color="#67e8f9"/>
+    <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="street-h" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#1e2a4a" stop-opacity="0"/>
+    <stop offset="20%" stop-color="#3730a3"/>
+    <stop offset="80%" stop-color="#3730a3"/>
+    <stop offset="100%" stop-color="#1e2a4a" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="street-v" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#1e2a4a" stop-opacity="0"/>
+    <stop offset="20%" stop-color="#3730a3"/>
+    <stop offset="80%" stop-color="#3730a3"/>
+    <stop offset="100%" stop-color="#1e2a4a" stop-opacity="0"/>
+  </linearGradient>
+  <style>
+    .particle { animation-timing-function: linear; animation-iteration-count: infinite; }
+    @keyframes move-right { from { transform: translateX(-20px); } to { transform: translateX(920px); } }
+    @keyframes move-left  { from { transform: translateX(920px); } to { transform: translateX(-20px); } }
+    @keyframes move-down  { from { transform: translateY(-20px); } to { transform: translateY(540px); } }
+    @keyframes move-up    { from { transform: translateY(540px); } to { transform: translateY(-20px); } }
+    @keyframes pulse-ring { 0%,100% { r:10; opacity:0.8; } 50% { r:22; opacity:0; } }
+    @keyframes pulse-ring2{ 0%,100% { r:14; opacity:0.5; } 50% { r:28; opacity:0; } }
+    @keyframes pulse-dot  { 0%,100% { opacity:1; r:4; } 50% { opacity:0.6; r:5; } }
+    @keyframes blink-green{ 0%,40%,100% { opacity:1; } 50%,90% { opacity:0.2; } }
+    @keyframes blink-red  { 0%,40%,100% { opacity:0.2; } 50%,90% { opacity:1; } }
+    @keyframes data-flow  { 0% { stroke-dashoffset:200; } 100% { stroke-dashoffset:0; } }
+    @keyframes fade-in-out{ 0%,100% { opacity:0; } 30%,70% { opacity:0.7; } }
+    @keyframes float-label{ 0%,100% { transform:translateY(0); } 50% { transform:translateY(-3px); } }
+  </style>
+</defs>
+
+<!-- Background -->
+<rect width="900" height="520" fill="url(#bg-grad)"/>
+
+<!-- Dot grid -->
+<pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+  <circle cx="20" cy="20" r="0.8" fill="#1e2a4a" opacity="0.6"/>
+</pattern>
+<rect width="900" height="520" fill="url(#dots)"/>
+
+<!-- Faint PRATO watermark -->
+<text x="450" y="290" font-family="'Arial Black',Arial,sans-serif" font-size="200" font-weight="900"
+  text-anchor="middle" fill="#6366f1" opacity="0.03" letter-spacing="-10">PRATO</text>
+
+<!-- ══════════════ STREETS ══════════════ -->
+<!-- Street glow halos (wide blur) -->
+<!-- Horizontal streets: y = 100, 200, 300, 400, 440 (main: 200, 300) -->
+
+<!-- H minor top -->
+<rect x="0" y="97" width="900" height="6" fill="#1e3a5f" opacity="0.4"/>
+<rect x="0" y="98" width="900" height="4" fill="#2d4a7a" opacity="0.5"/>
+<!-- H major 200 -->
+<rect x="0" y="197" width="900" height="10" fill="#3730a3" opacity="0.25" filter="url(#glow-soft)"/>
+<rect x="0" y="198" width="900" height="8" fill="url(#street-h)"/>
+<!-- H major 300 (centro) -->
+<rect x="0" y="297" width="900" height="12" fill="#4f46e5" opacity="0.3" filter="url(#glow-soft)"/>
+<rect x="0" y="298" width="900" height="8" fill="url(#street-h)"/>
+<!-- H minor 400 -->
+<rect x="0" y="397" width="900" height="6" fill="#1e3a5f" opacity="0.4"/>
+<rect x="0" y="398" width="900" height="4" fill="#2d4a7a" opacity="0.5"/>
+
+<!-- Vertical streets: x = 130, 270, 420, 570, 720, 820 (main: 270, 420, 570) -->
+<rect x="127" y="0" width="6" height="520" fill="#1e3a5f" opacity="0.4"/>
+<rect x="128" y="0" width="4" height="520" fill="#2d4a7a" opacity="0.5"/>
+
+<rect x="267" y="0" width="10" height="520" fill="#3730a3" opacity="0.25" filter="url(#glow-soft)"/>
+<rect x="268" y="0" width="8" height="520" fill="url(#street-v)"/>
+
+<rect x="418" y="0" width="12" height="520" fill="#4f46e5" opacity="0.3" filter="url(#glow-soft)"/>
+<rect x="419" y="0" width="8" height="520" fill="url(#street-v)"/>
+
+<rect x="568" y="0" width="10" height="520" fill="#3730a3" opacity="0.25" filter="url(#glow-soft)"/>
+<rect x="569" y="0" width="8" height="520" fill="url(#street-v)"/>
+
+<rect x="718" y="0" width="6" height="520" fill="#1e3a5f" opacity="0.4"/>
+<rect x="719" y="0" width="4" height="520" fill="#2d4a7a" opacity="0.5"/>
+
+<!-- Diagonal street (arteria diagonale) -->
+<line x1="0" y1="400" x2="900" y2="120" stroke="#3730a3" stroke-width="5" opacity="0.3" filter="url(#glow-soft)"/>
+<line x1="0" y1="403" x2="900" y2="123" stroke="#4f46e5" stroke-width="2" opacity="0.5"/>
+
+<!-- ══════════════ DATA FLOW LINES (animated dashes) ══════════════ -->
+<line x1="0" y1="200" x2="900" y2="200" stroke="#06b6d4" stroke-width="1" stroke-dasharray="8,30" opacity="0.5">
+  <animate attributeName="stroke-dashoffset" from="38" to="0" dur="1.2s" repeatCount="indefinite"/>
+</line>
+<line x1="0" y1="301" x2="900" y2="301" stroke="#a855f7" stroke-width="1" stroke-dasharray="6,40" opacity="0.4">
+  <animate attributeName="stroke-dashoffset" from="0" to="46" dur="1.6s" repeatCount="indefinite"/>
+</line>
+<line x1="423" y1="0" x2="423" y2="520" stroke="#06b6d4" stroke-width="1" stroke-dasharray="8,30" opacity="0.4">
+  <animate attributeName="stroke-dashoffset" from="38" to="0" dur="1.4s" repeatCount="indefinite"/>
+</line>
+<line x1="271" y1="0" x2="271" y2="520" stroke="#a855f7" stroke-width="1" stroke-dasharray="6,40" opacity="0.35">
+  <animate attributeName="stroke-dashoffset" from="0" to="46" dur="1.8s" repeatCount="indefinite"/>
+</line>
+
+<!-- ══════════════ TRAFFIC PARTICLES ══════════════ -->
+<!-- Moving right on H200 -->
+<circle class="particle" cy="201" r="2.5" fill="#06b6d4" style="animation: move-right 4s linear infinite; animation-delay:0s"/>
+<circle class="particle" cy="201" r="2"   fill="#a5b4fc" style="animation: move-right 4s linear infinite; animation-delay:-1.5s"/>
+<circle class="particle" cy="201" r="2.5" fill="#06b6d4" style="animation: move-right 6s linear infinite; animation-delay:-3s"/>
+<circle class="particle" cy="203" r="3"   fill="#f0abfc" opacity="0.8" style="animation: move-right 3.5s linear infinite; animation-delay:-0.8s"/>
+
+<!-- Moving left on H200 -->
+<circle class="particle" cy="199" r="2"   fill="#818cf8" style="animation: move-left 5s linear infinite; animation-delay:-2s"/>
+<circle class="particle" cy="199" r="2.5" fill="#67e8f9" style="animation: move-left 4.5s linear infinite; animation-delay:-4s"/>
+
+<!-- Moving right on H300 -->
+<circle class="particle" cy="300" r="3"   fill="#a855f7" style="animation: move-right 3s linear infinite; animation-delay:-0.5s"/>
+<circle class="particle" cy="300" r="2.5" fill="#06b6d4" style="animation: move-right 5s linear infinite; animation-delay:-2.5s"/>
+<circle class="particle" cy="302" r="2"   fill="#c4b5fd" style="animation: move-right 4s linear infinite; animation-delay:-1s"/>
+<!-- Moving left on H300 -->
+<circle class="particle" cy="301" r="2.5" fill="#818cf8" style="animation: move-left 3.5s linear infinite; animation-delay:-3s"/>
+<circle class="particle" cy="299" r="2"   fill="#7dd3fc" style="animation: move-left 6s linear infinite; animation-delay:-1s"/>
+
+<!-- Moving right on H100 -->
+<circle class="particle" cy="100" r="1.5" fill="#6366f1" opacity="0.7" style="animation: move-right 7s linear infinite; animation-delay:-3s"/>
+<circle class="particle" cy="100" r="1.5" fill="#06b6d4" opacity="0.6" style="animation: move-right 5s linear infinite; animation-delay:-1s"/>
+<!-- H400 -->
+<circle class="particle" cy="400" r="1.5" fill="#6366f1" opacity="0.7" style="animation: move-right 6s linear infinite; animation-delay:-2s"/>
+<circle class="particle" cy="400" r="1.5" fill="#818cf8" opacity="0.6" style="animation: move-left 4s linear infinite; animation-delay:-1.5s"/>
+
+<!-- Vertical V270 down -->
+<circle class="particle" cx="270" r="2.5" fill="#a855f7" style="animation: move-down 4s linear infinite; animation-delay:0s"/>
+<circle class="particle" cx="270" r="2"   fill="#06b6d4" style="animation: move-down 5s linear infinite; animation-delay:-2s"/>
+<!-- V270 up -->
+<circle class="particle" cx="271" r="2"   fill="#818cf8" style="animation: move-up 4.5s linear infinite; animation-delay:-1s"/>
+
+<!-- Vertical V420 down -->
+<circle class="particle" cx="422" r="3"   fill="#6366f1" style="animation: move-down 3.5s linear infinite; animation-delay:-0.5s"/>
+<circle class="particle" cx="422" r="2.5" fill="#a855f7" style="animation: move-down 5s linear infinite; animation-delay:-2.5s"/>
+<circle class="particle" cx="422" r="2"   fill="#67e8f9" style="animation: move-down 4s linear infinite; animation-delay:-1.5s"/>
+<!-- V420 up -->
+<circle class="particle" cx="420" r="2.5" fill="#c4b5fd" style="animation: move-up 3s linear infinite; animation-delay:-0.2s"/>
+<circle class="particle" cx="420" r="2"   fill="#06b6d4" style="animation: move-up 6s linear infinite; animation-delay:-3s"/>
+
+<!-- Vertical V570 -->
+<circle class="particle" cx="571" r="2.5" fill="#06b6d4" style="animation: move-down 5.5s linear infinite; animation-delay:-1s"/>
+<circle class="particle" cx="570" r="2"   fill="#818cf8" style="animation: move-up 4s linear infinite; animation-delay:-3s"/>
+
+<!-- ══════════════ INTERSECTION NODES ══════════════ -->
+<!-- Define intersections: H×V crossings + diagonal crossings -->
+<!-- Major node: (422,300) center -->
+<g transform="translate(422,300)">
+  <circle r="28" fill="#6366f1" opacity="0.05" filter="url(#glow-node)"/>
+  <circle r="20" fill="#6366f1" opacity="0.08"/>
+  <circle r="0" fill="none" stroke="#6366f1" stroke-width="1.5" opacity="0.6">
+    <animate attributeName="r" values="10;28" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="0" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5">
+    <animate attributeName="r" values="14;32" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="7" fill="url(#node-grad-main)" filter="url(#glow-soft)"/>
+  <circle r="3" fill="white" opacity="0.9"/>
+</g>
+<!-- Secondary major: (270,200) -->
+<g transform="translate(270,200)">
+  <circle r="22" fill="#06b6d4" opacity="0.06" filter="url(#glow-node)"/>
+  <circle r="0" fill="none" stroke="#06b6d4" stroke-width="1.2" opacity="0.6">
+    <animate attributeName="r" values="8;22" dur="2.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="5" fill="url(#node-grad-cyan)" filter="url(#glow-soft)"/>
+  <circle r="2.5" fill="white" opacity="0.85"/>
+</g>
+<!-- Secondary major: (570,300) -->
+<g transform="translate(570,300)">
+  <circle r="22" fill="#a855f7" opacity="0.06" filter="url(#glow-node)"/>
+  <circle r="0" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.6">
+    <animate attributeName="r" values="8;22" dur="2.2s" begin="0.8s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0" dur="2.2s" begin="0.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="5" fill="url(#node-grad-main)" filter="url(#glow-soft)"/>
+  <circle r="2.5" fill="white" opacity="0.85"/>
+</g>
+<!-- Standard nodes: all other H×V intersections -->
+<!-- H100 row -->
+<g transform="translate(130,100)"><circle r="3.5" fill="#4f46e5" opacity="0.7"/><circle r="1.8" fill="#a5b4fc"/></g>
+<g transform="translate(270,100)"><circle r="4" fill="#6366f1" opacity="0.7"/><circle r="2" fill="#c4b5fd"/></g>
+<g transform="translate(422,100)"><circle r="4.5" fill="#4f46e5" filter="url(#glow-soft)"/><circle r="2" fill="white" opacity="0.8"/></g>
+<g transform="translate(570,100)"><circle r="4" fill="#6366f1" opacity="0.7"/><circle r="2" fill="#c4b5fd"/></g>
+<g transform="translate(720,100)"><circle r="3.5" fill="#4f46e5" opacity="0.7"/><circle r="1.8" fill="#a5b4fc"/></g>
+<!-- H200 row -->
+<g transform="translate(130,200)"><circle r="4" fill="#06b6d4" opacity="0.6"/><circle r="2" fill="#67e8f9"/></g>
+<!-- (270,200) already done as major -->
+<g transform="translate(422,200)">
+  <circle r="0" fill="none" stroke="#06b6d4" stroke-width="1" opacity="0.5">
+    <animate attributeName="r" values="6;16" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="5" fill="#06b6d4" filter="url(#glow-soft)"/><circle r="2.5" fill="white" opacity="0.8"/>
+</g>
+<g transform="translate(570,200)"><circle r="4" fill="#818cf8" opacity="0.7"/><circle r="2" fill="#c4b5fd"/></g>
+<g transform="translate(720,200)"><circle r="4" fill="#06b6d4" opacity="0.6"/><circle r="2" fill="#67e8f9"/></g>
+<!-- H300 row -->
+<g transform="translate(130,300)"><circle r="4" fill="#818cf8" opacity="0.6"/><circle r="2" fill="#a5b4fc"/></g>
+<g transform="translate(270,300)">
+  <circle r="0" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5">
+    <animate attributeName="r" values="6;18" dur="2.8s" begin="0.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0" dur="2.8s" begin="0.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="5" fill="#a855f7" filter="url(#glow-soft)"/><circle r="2.5" fill="white" opacity="0.8"/>
+</g>
+<!-- (422,300) already done as main -->
+<!-- (570,300) already done -->
+<g transform="translate(720,300)"><circle r="4" fill="#818cf8" opacity="0.6"/><circle r="2" fill="#a5b4fc"/></g>
+<!-- H400 row -->
+<g transform="translate(130,400)"><circle r="3.5" fill="#4f46e5" opacity="0.5"/><circle r="1.8" fill="#818cf8"/></g>
+<g transform="translate(270,400)"><circle r="4" fill="#06b6d4" opacity="0.6"/><circle r="2" fill="#67e8f9"/></g>
+<g transform="translate(422,400)"><circle r="4" fill="#6366f1" opacity="0.6"/><circle r="2" fill="#a5b4fc"/></g>
+<g transform="translate(570,400)"><circle r="4" fill="#06b6d4" opacity="0.6"/><circle r="2" fill="#67e8f9"/></g>
+<g transform="translate(720,400)"><circle r="3.5" fill="#4f46e5" opacity="0.5"/><circle r="1.8" fill="#818cf8"/></g>
+
+<!-- ══════════════ TRAFFIC SIGNALS (small colored dots at key nodes) ══════════════ -->
+<!-- Signal at (422,300) - green phase -->
+<g transform="translate(432,290)">
+  <circle r="4" fill="#10b981" filter="url(#glow-soft)" style="animation: blink-green 4s ease infinite"/>
+  <circle r="4" fill="#ef4444" opacity="0" style="animation: blink-red 4s ease infinite"/>
+</g>
+<!-- Signal at (270,200) -->
+<g transform="translate(280,190)">
+  <circle r="3" fill="#10b981" filter="url(#glow-soft)" style="animation: blink-green 5s ease infinite; animation-delay:-2s"/>
+  <circle r="3" fill="#ef4444" opacity="0" style="animation: blink-red 5s ease infinite; animation-delay:-2s"/>
+</g>
+<!-- Signal at (570,300) -->
+<g transform="translate(580,290)">
+  <circle r="3" fill="#10b981" filter="url(#glow-soft)" style="animation: blink-green 3.5s ease infinite; animation-delay:-1s"/>
+  <circle r="3" fill="#ef4444" opacity="0" style="animation: blink-red 3.5s ease infinite; animation-delay:-1s"/>
+</g>
+
+<!-- ══════════════ ENVIRONMENTAL SENSOR ICONS ══════════════ -->
+<g transform="translate(150,380)" opacity="0.7">
+  <circle r="12" fill="#0a0b0f" stroke="#10b981" stroke-width="1.2"/>
+  <text x="0" y="4" font-size="12" text-anchor="middle" fill="#10b981" font-family="monospace">CO₂</text>
+  <circle r="12" fill="none" stroke="#10b981" stroke-width="0.8" opacity="0.4">
+    <animate attributeName="r" values="12;20" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.4;0" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</g>
+<g transform="translate(700,130)" opacity="0.7">
+  <circle r="12" fill="#0a0b0f" stroke="#f59e0b" stroke-width="1.2"/>
+  <text x="0" y="4" font-size="10" text-anchor="middle" fill="#f59e0b" font-family="monospace">PM10</text>
+  <circle r="12" fill="none" stroke="#f59e0b" stroke-width="0.8" opacity="0.4">
+    <animate attributeName="r" values="12;20" dur="4s" begin="1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.4;0" dur="4s" begin="1s" repeatCount="indefinite"/>
+  </circle>
+</g>
+
+<!-- ══════════════ DATA LABELS (floating stats) ══════════════ -->
+<g style="animation: fade-in-out 6s ease infinite; animation-delay:0s" transform="translate(50,55)">
+  <rect x="0" y="0" width="120" height="36" rx="6" fill="#0d1117" stroke="#6366f1" stroke-width="0.8" opacity="0.85"/>
+  <text x="10" y="13" font-size="8" fill="#8892a4" font-family="monospace">BUS LAM · Via Bologna</text>
+  <text x="10" y="27" font-size="10" fill="#06b6d4" font-family="monospace" font-weight="bold">+3 min ⟶ VERDE</text>
+</g>
+<g style="animation: fade-in-out 6s ease infinite; animation-delay:-2s" transform="translate(720,380)">
+  <rect x="0" y="0" width="130" height="36" rx="6" fill="#0d1117" stroke="#a855f7" stroke-width="0.8" opacity="0.85"/>
+  <text x="10" y="13" font-size="8" fill="#8892a4" font-family="monospace">QUEUE · Piazza Stazione</text>
+  <text x="10" y="27" font-size="10" fill="#a855f7" font-family="monospace" font-weight="bold">47 veicoli → GATING</text>
+</g>
+<g style="animation: fade-in-out 6s ease infinite; animation-delay:-4s" transform="translate(330,440)">
+  <rect x="0" y="0" width="140" height="36" rx="6" fill="#0d1117" stroke="#10b981" stroke-width="0.8" opacity="0.85"/>
+  <text x="10" y="13" font-size="8" fill="#8892a4" font-family="monospace">ARPAT · PM10</text>
+  <text x="10" y="27" font-size="10" fill="#10b981" font-family="monospace" font-weight="bold">32 µg/m³ · OK ✓</text>
+</g>
+
+<!-- ══════════════ TITLE OVERLAY ══════════════ -->
+<g transform="translate(450,260)">
+  <!-- Icon: traffic signal -->
+  <g transform="translate(-80,-10)">
+    <rect x="-12" y="-30" width="24" height="60" rx="5" fill="#0d1117" stroke="#6366f1" stroke-width="1.2" opacity="0.9"/>
+    <circle cx="0" cy="-14" r="6" fill="#ef4444" style="animation: blink-red 4s ease infinite; animation-delay:-1s"/>
+    <circle cx="0" cy="0"  r="6" fill="#f59e0b" opacity="0.3"/>
+    <circle cx="0" cy="15" r="6" fill="#10b981" style="animation: blink-green 4s ease infinite; animation-delay:-1s"/>
+  </g>
+</g>
+</svg>

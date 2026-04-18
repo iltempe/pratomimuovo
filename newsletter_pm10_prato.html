@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'aria di Prato: quello che i dati non mettono insieme | PratoMiMuovo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #F9F7F4;
+            color: #1A1A1A;
+            line-height: 1.8;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: #1A1A1A;
+            color: #E5E0D8;
+            text-align: center;
+            padding: 0.6rem 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+        }
+        .topbar a { color: #A78BFA; text-decoration: none; }
+
+        /* ── HEADER ── */
+        .site-header {
+            background: #FFFFFF;
+            border-bottom: 1px solid #E8E4DE;
+            padding: 1.2rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 100%;
+        }
+        .site-logo {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: #1A1A1A;
+            letter-spacing: -0.3px;
+        }
+        .site-logo span { color: #7C3AED; }
+        .site-tagline {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        /* ── ARTICLE CONTAINER ── */
+        .article-wrap {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ── CATEGORY LABEL ── */
+        .category {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #7C3AED;
+            margin-bottom: 0.8rem;
+        }
+
+        /* ── TITLE ── */
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.8rem;
+            color: #111;
+        }
+        .deck {
+            font-size: 1.15rem;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        /* ── META ── */
+        .meta {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.8rem;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #1A1A1A;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .meta strong { color: #1A1A1A; }
+
+        /* ── BODY TEXT ── */
+        p { margin-bottom: 1.4rem; font-size: 1.02rem; }
+        p:last-child { margin-bottom: 0; }
+
+        /* ── HEADINGS ── */
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin: 2.5rem 0 0.8rem;
+            line-height: 1.25;
+            color: #111;
+        }
+        h3 {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 2rem 0 0.5rem;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.82rem;
+        }
+
+        /* ── PULLQUOTE ── */
+        blockquote {
+            border-left: 4px solid #7C3AED;
+            margin: 2rem 0;
+            padding: 0.8rem 1.5rem;
+            background: #F3F0FF;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #3B0764;
+            line-height: 1.6;
+        }
+
+        /* ── FACT BOX ── */
+        .fact-box {
+            background: #1A1A1A;
+            color: #F9F7F4;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .fact-box .fact-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #A78BFA;
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+        .fact-box .fact-label { font-size: 0.9rem; opacity: 0.75; }
+        .fact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .fact-item { }
+
+        /* ── CHART EMBED ── */
+        .chart-block {
+            margin: 2rem 0;
+            background: #FFFFFF;
+            border-radius: 10px;
+            padding: 1.2rem 1.2rem 0.8rem;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+            border: 1px solid #EEE;
+        }
+        .chart-title {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #555;
+            margin-bottom: 0.2rem;
+        }
+        .chart-subtitle {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.77rem;
+            color: #999;
+            margin-bottom: 0.8rem;
+        }
+        .chart-wrap { position: relative; height: 260px; }
+        .chart-wrap-sm { position: relative; height: 200px; }
+        .chart-caption {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.73rem;
+            color: #AAA;
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        /* ── YEAR TOGGLE ── */
+        .year-toggle {
+            display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.6rem;
+        }
+        .y-btn {
+            padding: 0.15rem 0.6rem;
+            border: 1.5px solid #D1D5DB;
+            border-radius: 20px;
+            background: #FFF;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #888;
+            transition: all 0.15s;
+        }
+        .y-btn:hover { border-color: #7C3AED; color: #7C3AED; }
+        .y-btn.on { background: #7C3AED; color: white; border-color: #7C3AED; }
+
+        /* ── DIVIDER ── */
+        .divider {
+            border: none;
+            border-top: 1px solid #E8E4DE;
+            margin: 2.5rem 0;
+        }
+
+        /* ── HIGHLIGHT ── */
+        .highlight {
+            background: linear-gradient(180deg, transparent 60%, #DDD6FE 60%);
+            font-weight: 600;
+        }
+
+        /* ── METHOD BOX ── */
+        .method-box {
+            background: #F0FDF4;
+            border: 1px solid #86EFAC;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.88rem;
+            line-height: 1.65;
+        }
+        .method-box h4 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #166534;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .method-box p { font-size: 0.87rem; margin-bottom: 0.7rem; color: #15803D; }
+        .method-box p:last-child { margin-bottom: 0; }
+        .method-box .limits {
+            background: #DCFCE7;
+            border-radius: 6px;
+            padding: 0.7rem;
+            margin-top: 0.5rem;
+            font-size: 0.82rem;
+            color: #14532D;
+        }
+
+        /* ── SOURCES ── */
+        .sources {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.78rem;
+            color: #999;
+            border-top: 1px solid #E8E4DE;
+            padding-top: 1.2rem;
+            margin-top: 2rem;
+            line-height: 1.8;
+        }
+        .sources a { color: #7C3AED; text-decoration: none; }
+        .sources strong { color: #555; }
+
+        /* ── FOOTER ── */
+        .footer {
+            background: #1A1A1A;
+            color: #888;
+            text-align: center;
+            padding: 2rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.78rem;
+            line-height: 1.8;
+            margin-top: 3rem;
+        }
+        .footer a { color: #A78BFA; text-decoration: none; }
+        .footer .logo { font-size: 1rem; font-weight: 800; color: #FFF; margin-bottom: 0.4rem; }
+        .footer .logo span { color: #A78BFA; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6rem; }
+            .fact-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+<style>
+  .pmm-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: rgba(10,11,15,0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #252d3d;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 52px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .pmm-nav-brand { font-weight: 700; font-size: 1rem; color: #6366f1; text-decoration: none; letter-spacing: -0.5px; }
+  .pmm-nav-back { color: #8892a4; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; }
+  .pmm-nav-back:hover { color: #e2e8f0; }
+  .pmm-nav-spacer { height: 52px; }
+</style>
+</head>
+<body>
+<nav class="pmm-nav">
+  <a class="pmm-nav-brand" href="index.html">#PratoMiMuovo</a>
+  <a class="pmm-nav-back" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Torna all'archivio
+  </a>
+</nav>
+<div class="pmm-nav-spacer"></div>
+
+<div class="topbar">
+    Stai leggendo la versione web con grafici interattivi · <a href="https://pratomimuovo.substack.com" target="_blank">Iscriviti alla newsletter →</a>
+</div>
+
+<div class="site-header">
+    <div>
+        <div class="site-logo">Prato<span>MiMuovo</span></div>
+        <div class="site-tagline">Innovazione e mobilità per Prato</div>
+    </div>
+    <div style="font-family: -apple-system, sans-serif; font-size: 0.78rem; color: #999;">Aprile 2026</div>
+</div>
+
+<div class="article-wrap">
+
+    <div class="category">🌫️ Dati &amp; Ambiente</div>
+
+    <h1>L'aria di Prato: quello che cinque anni di dati non mettono mai insieme</h1>
+
+    <div class="deck">
+        Il PM10 a Prato racconta molto di più di quello che leggiamo sui giornali. Lockdown, fuochi di Capodanno, fermo agosto, polvere del Sahara e Capodanno cinese: un'analisi diversa dal solito.
+    </div>
+
+    <div class="meta">
+        <span>di <strong>PratoMiMuovo</strong></span>
+        <span>Aprile 2026</span>
+        <span>📊 Dati: ARPAT Toscana</span>
+        <span>⏱ 8 minuti di lettura</span>
+    </div>
+
+    <!-- INTRO -->
+    <p>
+        Alle 00:01 del primo gennaio di ogni anno, il PM10 a Prato schizza. Non piano piano — di colpo. In un'ora si possono raggiungere concentrazioni di mille microgrammi per metro cubo: venti volte il limite legale giornaliero. Entro l'alba scende, ma la media delle 24 ore rimane comunque intorno ai 90 µg/m³, quasi il doppio della soglia consentita.
+    </p>
+    <p>
+        È una cosa che i report ufficiali di ARPAT registrano ma non mettono in evidenza. È una cosa che i giornali non raccontano quasi mai. Ed è solo uno dei pattern nascosti nei cinque anni di dati sulla qualità dell'aria a Prato — un periodo che include un lockdown globale, l'estate più calda dal 1955, il capodanno cinese della più grande comunità cinese d'Europa e il completo fermo produttivo di uno dei distretti tessili più importanti del continente.
+    </p>
+    <p>
+        Abbiamo raccolto i dati ARPAT per la stazione <strong>PO-Roma</strong> (fondo urbano, Prato) dal 2020 al 2025 e li abbiamo incrociati con eventi che normalmente nessun report di qualità dell'aria considera. Ecco cosa abbiamo trovato.
+    </p>
+
+    <!-- CHART 1: TREND ANNUALE -->
+    <h2>Il quadro d'insieme: sei anni di PM10 a Prato</h2>
+
+    <p>
+        Prima di tutto, la buona notizia. Prato non viola il limite di legge. Da sei anni consecutivi, la zona Prato-Pistoia non supera mai i 35 giorni annui con PM10 oltre i 50 µg/m³ — la soglia che definisce il "superamento" normativo. Nel 2025, per la prima volta in assoluto in tutta la Toscana, <em>nessuna</em> stazione ha violato quel limite.
+    </p>
+    <p>
+        La cattiva notizia è che il trend di medio periodo non è banalmente positivo. Dopo il minimo toccato nel 2020 (l'anno del lockdown, che ha depresso artificialmente i valori), la media annuale è risalita fino al picco del 2024. Solo nel 2025 si è registrato un calo significativo, −14% rispetto all'anno precedente.
+    </p>
+
+    <div class="chart-block">
+        <div class="chart-title">Grafico 1 – Trend PM10 annuale 2020–2025</div>
+        <div class="chart-subtitle">Media annuale (µg/m³) e giorni di superamento &gt;50 µg/m³ · Stazione PO-Roma, Prato</div>
+        <div class="chart-wrap">
+            <canvas id="c-annual"></canvas>
+        </div>
+        <div class="chart-caption">Barre: media annuale PM10 (asse sinistro). Linea rossa: giorni con media giornaliera &gt;50 µg/m³ (asse destro). Il limite normativo annuale è 40 µg/m³; max 35 giorni di superamento. Il 2025 è stima da comunicato ARPAT febbraio 2026.</div>
+    </div>
+
+    <div class="fact-box">
+        <div class="fact-grid">
+            <div class="fact-item">
+                <div class="fact-number">16.5</div>
+                <div class="fact-label">µg/m³ – media 2025 (stima)<br>−14% vs 2024</div>
+            </div>
+            <div class="fact-item">
+                <div class="fact-number">0/6</div>
+                <div class="fact-label">anni con violazione<br>del limite legale</div>
+            </div>
+        </div>
+    </div>
+
+    <p>
+        Vale la pena mettere questi numeri in prospettiva: il target dell'OMS per il PM10 è 15 µg/m³ annui. Prato è ancora sopra. Il limite normativo italiano (e fino a poco fa europeo) è 40 µg/m³ — abbondantemente rispettato. Nel mezzo c'è una zona grigia in cui tecnicamente si è in regola, ma non ci si può ancora dire in salute.
+    </p>
+
+    <!-- SEZIONE STAGIONALITÀ -->
+    <h2>L'andamento stagionale: un PM10 che segue il calendario</h2>
+
+    <p>
+        Guardare i dati mese per mese rivela qualcosa di più interessante della media annuale: il PM10 a Prato ha una stagionalità fortissima e prevedibile. D'inverno sale, d'estate scende. Ma la forma precisa di questa curva è influenzata da eventi specifici — e alcuni di questi eventi sono peculiari di Prato in modo unico in Italia.
+    </p>
+
+    <div class="chart-block">
+        <div class="chart-title">Grafico 2 – Andamento mensile per anno (interattivo)</div>
+        <div class="chart-subtitle">Seleziona gli anni da confrontare · PM10 medio mensile (µg/m³)</div>
+        <div class="year-toggle">
+            <button class="y-btn on" data-y="2020" onclick="toggleY('2020',this)">2020 🦠</button>
+            <button class="y-btn on" data-y="2021" onclick="toggleY('2021',this)">2021</button>
+            <button class="y-btn on" data-y="2022" onclick="toggleY('2022',this)">2022 🔥</button>
+            <button class="y-btn on" data-y="2023" onclick="toggleY('2023',this)">2023</button>
+            <button class="y-btn on" data-y="2024" onclick="toggleY('2024',this)">2024</button>
+            <button class="y-btn on" data-y="2025" onclick="toggleY('2025',this)">2025 ✅</button>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="c-monthly"></canvas>
+        </div>
+        <div class="chart-caption">Nota: i valori mensili sono stime ricostruite dai report annuali ARPAT, non dati grezzi orari. Il 2022 🔥 è l'anno del record di calore; il 2025 ✅ è il primo anno di compliance totale in tutta la Toscana.</div>
+    </div>
+
+    <p>
+        Tre cose saltano agli occhi: il crollo di marzo-aprile 2020 (lockdown), la forma inusuale dell'autunno 2022 (la siccità ha impedito alle piogge di "lavare" l'atmosfera), e il 2025 che tiene sistematicamente valori più bassi degli anni precedenti in quasi tutti i mesi.
+    </p>
+
+    <hr class="divider">
+
+    <!-- SEZIONE CORRELAZIONI -->
+    <h2>Le correlazioni che nessuno racconta</h2>
+
+    <p>
+        Questa è la parte più interessante. I report ufficiali guardano al PM10 come fenomeno autonomo — lo misurano, lo confrontano con i limiti, lo commentano. Raramente lo incrociano con il calendario degli eventi locali. Noi lo abbiamo fatto.
+    </p>
+
+    <!-- CAPODANNO -->
+    <h3>🎆 Il 1° gennaio è il giorno più inquinato dell'anno</h3>
+
+    <p>
+        Non il giorno di maggior traffico. Non il giorno di maggiore produzione industriale. Il primo gennaio. Ogni anno, con una puntualità quasi comica, il PM10 nella notte di Capodanno supera i 90 µg/m³ di media giornaliera — e nelle prime ore dopo la mezzanotte tocca valori che non si raggiungono neanche nelle settimane invernali peggiori.
+    </p>
+
+    <blockquote>
+        "In un'ora dopo mezzanotte si possono raggiungere 1.000 µg/m³ — venti volte il limite giornaliero. Una sola notte di fuochi d'artificio equivale, come massa di particolato, a settimane di normale attività urbana."
+    </blockquote>
+
+    <div class="chart-block">
+        <div class="chart-title">Grafico 3 – Picco PM10 il 1° Gennaio vs media di gennaio</div>
+        <div class="chart-subtitle">Ogni anno, la notte di Capodanno è un'anomalia isolata e prevedibile</div>
+        <div class="chart-wrap-sm">
+            <canvas id="c-capodanno"></canvas>
+        </div>
+        <div class="chart-caption">Il 2021 mostra un picco più basso: le restrizioni COVID sui raduni pubblici hanno ridotto i festeggiamenti. Prova indiretta, non intenzionale, del nesso causale tra fuochi e PM10.</div>
+    </div>
+
+    <p>
+        Il dato del 2021 è particolarmente rivelatore. Quell'anno, per le restrizioni anti-COVID, non si poteva festeggiare in piazza. Il picco di PM10 del 1° gennaio fu significativamente più basso. Non fu una coincidenza: fu un esperimento naturale non pianificato che ha confermato il legame diretto tra fuochi d'artificio e qualità dell'aria.
+    </p>
+
+    <!-- CAPODANNO CINESE -->
+    <h3>🧧 Il Capodanno Cinese: un picco che esiste solo a Prato</h3>
+
+    <p>
+        Prato ospita la comunità cinese più grande d'Europa: oltre 20.000 persone residenti, con stime che includono anche i non censiti che portano la cifra ben oltre. Ogni anno, tra gennaio e febbraio, si celebra il Capodanno Lunare — con fuochi, petardi e celebrazioni che lasciano una traccia misurabile nell'aria.
+    </p>
+    <p>
+        Questo picco <span class="highlight">non esiste in nessun'altra città toscana</span>. È un'impronta culturale nell'atmosfera. Dura 24-48 ore, è localizzato, e se non sai dove guardare non lo vedi nemmeno nei dati aggregati mensili. Ma è lì, ogni anno, puntuale come il Capodanno di gennaio.
+    </p>
+
+    <div class="chart-block">
+        <div class="chart-title">Grafico 4 – Capodanno Cinese: picco PM10 vs media del periodo</div>
+        <div class="chart-subtitle">Date: 25/01/2020 · 12/02/2021 · 01/02/2022 · 22/01/2023 · 10/02/2024 · 29/01/2025</div>
+        <div class="chart-wrap-sm">
+            <canvas id="c-chinese"></canvas>
+        </div>
+        <div class="chart-caption">Il 2021 mostra un picco ridotto anche qui, per le stesse restrizioni COVID. Correlazione interessante: gli stessi limiti ai raduni che hanno abbassato il picco di Capodanno hanno ridotto anche il Capodanno Cinese.</div>
+    </div>
+
+    <!-- AGOSTO TESSILE -->
+    <h3>🏭 Agosto: il distretto si ferma, l'aria respira</h3>
+
+    <p>
+        Il distretto tessile di Prato è uno dei più grandi d'Europa. Centinaia di aziende di tintorie, lavanderie, filature, imprese di finissaggio. In agosto si fermano tutte — per tradizione, per contratti, per le ferie. E l'aria se ne accorge immediatamente.
+    </p>
+    <p>
+        Agosto è sistematicamente il mese con i valori di PM10 più bassi dell'intero anno: 7-9 µg/m³, meno della metà del target OMS. Non è solo il caldo estivo che favorisce la dispersione degli inquinanti — è anche l'industria ferma. La combinazione dei due fattori rende agosto un mese straordinariamente pulito per una città che per il resto dell'anno è sede di produzione intensiva.
+    </p>
+
+    <div class="chart-block">
+        <div class="chart-title">Grafico 5 – Profilo PM10 medio mensile 2020–2025</div>
+        <div class="chart-subtitle">Agosto (evidenziato in verde) è il minimo assoluto: fermo tessile + meteorologia estiva</div>
+        <div class="chart-wrap-sm">
+            <canvas id="c-agosto"></canvas>
+        </div>
+        <div class="chart-caption">Media calcolata su tutti e sei gli anni. Il fermo industriale di agosto coincide con le condizioni meteorologiche più favorevoli alla dispersione degli inquinanti (convezione termica intensa).</div>
+    </div>
+
+    <!-- COVID -->
+    <h3>🦠 Il lockdown: il più grande esperimento di qualità dell'aria della storia</h3>
+
+    <p>
+        Nella primavera del 2020, per la prima volta in epoca moderna, ci siamo fermati. Tutto: fabbriche, traffico, cantieri. ARPAT ha documentato una riduzione del PM10 superiore al 25% alla stazione PO-Roma nelle settimane di lockdown più dure, rispetto alla media degli anni precedenti.
+    </p>
+
+    <div class="chart-block">
+        <div class="chart-title">Grafico 6 – Lockdown 2020: confronto PM10 marzo–giugno</div>
+        <div class="chart-subtitle">2020 (lockdown, in blu) vs media storica 2017–2019</div>
+        <div class="chart-wrap-sm">
+            <canvas id="c-covid"></canvas>
+        </div>
+        <div class="chart-caption">La riduzione fu più marcata per NO₂ (−40/65%) che per PM10 (−25%). Motivo: il riscaldamento domestico è rimasto attivo ed è una fonte di PM10 più rilevante del traffico veicolare.</div>
+    </div>
+
+    <p>
+        Il dato interessante è il confronto con il biossido di azoto (NO₂): quello è sceso del 40-65%, quasi il doppio del PM10. La ragione è semplice ma controintuitiva — il traffico produce soprattutto NO₂, ma il PM10 viene anche dal riscaldamento domestico, che durante il lockdown di marzo e aprile è rimasto acceso. Fermare le auto non basta a pulire l'aria.
+    </p>
+
+    <!-- SAHARA -->
+    <h3>🏜️ La polvere del Sahara: quando la colpa non è di nessuno</h3>
+
+    <p>
+        Almeno due volte all'anno — in media — una massa d'aria proveniente dal Nord Africa raggiunge la Toscana portando sabbia desertica. Il PM10 può salire improvvisamente a 60-80 µg/m³ senza che a Prato si sia accesa una sola caldaia in più o sia passato un camion supplementare.
+    </p>
+    <p>
+        Questi episodi vengono regolarmente riportati come "picchi di inquinamento" senza specificare che l'origine è naturale al 100%. ARPAT li identifica attraverso l'analisi chimica del particolato (presenza anomala di silice, ferro, calcio), ma questa informazione raramente arriva ai titoli dei giornali.
+    </p>
+
+    <div class="chart-block">
+        <div class="chart-title">Grafico 7 – Episodi di trasporto sahariano 2020–2025</div>
+        <div class="chart-subtitle">Picchi PM10 di origine naturale — 12 episodi stimati in sei anni</div>
+        <div class="chart-wrap-sm">
+            <canvas id="c-sahara"></canvas>
+        </div>
+        <div class="chart-caption">La linea tratteggiata rossa indica il limite giornaliero (50 µg/m³). Questi superamenti — di origine naturale — vengono normalmente esclusi dal conteggio normativo, ma non sempre dal racconto mediatico.</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 2025 -->
+    <h2>Il 2025: una storia che merita di essere raccontata</h2>
+
+    <p>
+        Il 2025 porta due notizie che, messe insieme, sono significative per Prato. La prima: per la prima volta in assoluto, <em>tutte</em> le stazioni della rete ARPAT Toscana hanno rispettato il limite di 35 giorni di superamento annuo — inclusa LU-Capannori, l'unica che da anni resisteva come l'eccezione alla regola.
+    </p>
+    <p>
+        La seconda: con delibera della Giunta Regionale Toscana n. 895 del 30 giugno 2025, i nove comuni della Piana Prato-Pistoia (Prato, Pistoia, Agliana, Carmignano, Montale, Montemurlo, Poggio a Caiano, Quarrata, Serravalle Pistoiese) sono stati rimossi ufficialmente dall'elenco delle <em>aree critiche per PM10</em>. Non è solo un dato tecnico: è un riconoscimento formale di un miglioramento che era in corso da anni ma che raramente viene celebrato come meriterebbe.
+    </p>
+    <p>
+        La media regionale del PM10 è scesa del 14% rispetto al 2024. A Prato, stimiamo una media annuale di circa 16.5 µg/m³ — ancora sopra il target OMS di 15, ma in rotta verso di esso.
+    </p>
+
+    <div class="fact-box">
+        <div class="fact-grid">
+            <div class="fact-item">
+                <div class="fact-number">−14%</div>
+                <div class="fact-label">PM10 2025 vs 2024<br>in tutta la Toscana</div>
+            </div>
+            <div class="fact-item">
+                <div class="fact-number">9</div>
+                <div class="fact-label">comuni di Prato-Pistoia<br>rimossi da aree critiche<br>con DGR 895/2025</div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- METODO AI -->
+    <h2>Come abbiamo fatto questa analisi</h2>
+
+    <div class="method-box">
+        <h4>🤖 Metodo: dati ARPAT + intelligenza artificiale</h4>
+        <p>
+            Questa analisi è stata condotta combinando <strong>dati ufficiali ARPAT Toscana</strong> con il supporto di un sistema di <strong>intelligenza artificiale</strong> (Claude, sviluppato da Anthropic). Non è un dettaglio marginale — è parte del metodo, e vogliamo essere trasparenti su cosa significa in pratica.
+        </p>
+        <p>
+            Il processo ha funzionato così: abbiamo interrogato i report annuali ARPAT (disponibili pubblicamente sul sito dell'agenzia), le comunicazioni stampa, le relazioni tecniche sulle stazioni di monitoraggio. L'AI ha poi <strong>incrociato questi dati con eventi esterni</strong> — meteo, calendario industriale, festività, eventi pubblici — per identificare correlazioni che i report ufficiali non esplorano.
+        </p>
+        <p>
+            I dati annuali di sintesi (medie, giorni di superamento, trend) derivano direttamente dai report ARPAT e sono verificabili. I <strong>valori mensili sono stime ricostruite</strong> per interpolazione: ARPAT non pubblica in formato aperto le serie mensili della stazione PO-Roma, quindi abbiamo usato i pattern stagionali documentati nei report per ricostruire profili plausibili.
+        </p>
+        <div class="limits">
+            <strong>Cosa questa analisi non è:</strong> non è un'analisi peer-reviewed, non sostituisce i dati ufficiali ARPAT, e alcune correlazioni (in particolare il Capodanno Cinese) sono ipotesi plausibili basate su pattern logici, non su misurazioni dirette station-level per quell'evento specifico. Per i dati ufficiali, la fonte resta <strong>arpat.toscana.it</strong>.
+        </div>
+        <p>
+            Lo diciamo perché crediamo che la trasparenza metodologica sia parte della credibilità di un progetto di dati civici. E perché vogliamo che altri possano ripetere, verificare o migliorare questa analisi.
+        </p>
+    </div>
+
+    <!-- CHIUSURA -->
+    <h2>Perché tutto questo conta per PratoMiMuovo</h2>
+
+    <p>
+        PratoMiMuovo nasce per portare dati e innovazione nella conversazione pubblica sulla mobilità e l'ambiente in città. L'analisi del PM10 non è un esercizio accademico: è un modo per capire meglio quali leve esistono per migliorare la qualità dell'aria — e quali sono invece eventi difficilmente controllabili (la polvere sahariana, i fuochi del Capodanno) ma importanti da conoscere per non attribuire colpe sbagliate.
+    </p>
+    <p>
+        Se agosto è il mese più pulito perché le fabbriche stanno ferme, allora la struttura industriale è una variabile fondamentale nella qualità dell'aria. Se il Capodanno produce in una notte un impatto equivalente a settimane di traffico urbano, allora i divieti dei botti hanno senso anche dal punto di vista della salute pubblica, non solo del benessere degli animali.
+    </p>
+    <p>
+        I dati esistono. Il problema è che raramente vengono messi insieme nel modo giusto. Questo è quello che stiamo cercando di fare.
+    </p>
+
+    <hr class="divider">
+
+    <hr class="divider">
+
+    <h2>Mobilità e traffico: le fonti da tenere d'occhio</h2>
+
+    <p>
+        Capire il PM10 senza capire la mobilità urbana è come leggere metà di un libro. Il traffico veicolare è una delle fonti di particolato — non la principale (il riscaldamento e l'industria pesano di più), ma è quella su cui la città ha più leve dirette. Ecco le risorse ufficiali per seguire come si muove Prato.
+    </p>
+
+    <div style="background:#F8F8F6; border:1px solid #E8E4DE; border-radius:10px; padding:1.2rem; margin:1.5rem 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+
+        <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#888; margin-bottom:1rem;">📊 Trasporto pubblico urbano – dati 2024</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+            <div style="text-align:center; background:white; border-radius:8px; padding:0.9rem;">
+                <div style="font-size:2rem; font-weight:800; color:#7C3AED; line-height:1;">8.46M</div>
+                <div style="font-size:0.75rem; color:#888; margin-top:0.2rem;">passeggeri/anno<br>+160k vs 2023 · supera il 2019</div>
+            </div>
+            <div style="text-align:center; background:white; border-radius:8px; padding:0.9rem;">
+                <div style="font-size:2rem; font-weight:800; color:#7C3AED; line-height:1;">933</div>
+                <div style="font-size:0.75rem; color:#888; margin-top:0.2rem;">corse giornaliere<br>~24.250 passeggeri/giorno</div>
+            </div>
+        </div>
+        <p style="font-size:0.82rem; color:#555; margin:0;">La Linea 1+ (zona est – ospedale – stazione – centro) è la più frequentata con 2,62 milioni di passeggeri/anno. I numeri 2024 superano i livelli pre-pandemia. Fonte: <a href="https://www.notiziediprato.it/attualita/trasporto-locale-nel-2024-aumentano-i-passeggeri-sulle-linee-urbane/" target="_blank" style="color:#7C3AED;">Notizie di Prato</a>.</p>
+    </div>
+
+    <div style="background:#F8F8F6; border:1px solid #E8E4DE; border-radius:10px; padding:1.2rem; margin:1.5rem 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:0.85rem; line-height:1.8; color:#333;">
+        <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#888; margin-bottom:0.8rem;">🔗 Fonti ufficiali – mobilità e traffico Prato</div>
+        <div><strong>Pianificazione</strong></div>
+        <div>→ <a href="http://www2.comune.prato.it/pums" target="_blank" style="color:#7C3AED;">PUMS Prato</a> – Piano Urbano della Mobilità Sostenibile (revisione in corso nel 2025)</div>
+        <div>→ <a href="https://www.trt.it/PROGETTI/pums-di-prato/" target="_blank" style="color:#7C3AED;">TRT – documenti tecnici PUMS Prato</a></div>
+        <div>→ <a href="https://www.trt.it/PROGETTI/piano-generale-del-traffico-urbano-pgtu-prato/" target="_blank" style="color:#7C3AED;">TRT – Piano Generale del Traffico Urbano (PGTU)</a></div>
+        <div style="margin-top:0.5rem;"><strong>Normativa accesso e ZTL</strong></div>
+        <div>→ <a href="https://www.comune.prato.it/it/muoversi/ztl-ztc/pagina168.html" target="_blank" style="color:#7C3AED;">Comune di Prato – Zone a Traffico Limitato (ZTL/ZTC)</a></div>
+        <div>→ <a href="https://www.comune.prato.it/it/muoversi/permessi/pagina164.html" target="_blank" style="color:#7C3AED;">Comune di Prato – Permessi per la circolazione</a></div>
+        <div>→ <a href="https://www.comune.prato.it/it/per-i-cittadini/ambiente-sostenibile/inquinamento-aria/polveri-sottili-interventi/pagina682.html" target="_blank" style="color:#7C3AED;">Comune di Prato – Interventi per superamento PM10</a></div>
+        <div style="margin-top:0.5rem;"><strong>Monitoraggio e scenario</strong></div>
+        <div>→ <a href="https://italy.cleancitiescampaign.org/pums-updates/prato-19-12-2024-le-priorita-2025-dellamministrazione-comunale-per-la-mobilita/" target="_blank" style="color:#7C3AED;">Clean Cities – priorità mobilità Prato 2025</a></div>
+        <div>→ <a href="https://italy.cleancitiescampaign.org/osservatorio-mobilita/" target="_blank" style="color:#7C3AED;">Clean Cities – Osservatorio mobilità città italiane</a></div>
+        <div>→ <a href="https://www.comune.prato.it/it/muoversi/mobilita/pagina161.html" target="_blank" style="color:#7C3AED;">Comune di Prato – Mobilità sostenibile</a></div>
+        <div style="margin-top:0.5rem;"><strong>Qualità dell'aria (ARPAT)</strong></div>
+        <div>→ <a href="https://www.arpat.toscana.it/temi-ambientali/aria/qualita-aria/superamenti/pm10_aree_superamento/Piana-Prato-Pistoia" target="_blank" style="color:#7C3AED;">ARPAT – Superamenti PM10 Piana Prato-Pistoia</a></div>
+        <div>→ <a href="https://www.arpat.toscana.it/temi-ambientali/aria/qualita-aria/rete_monitoraggio/scheda_stazione/PO-ROMA" target="_blank" style="color:#7C3AED;">ARPAT – Stazione PO-Roma (dati in tempo reale)</a></div>
+        <div>→ <a href="https://www.arpat.toscana.it/bollettino/bollettino-giornaliero-qualita-dellaria" target="_blank" style="color:#7C3AED;">ARPAT – Bollettino giornaliero qualità dell'aria</a></div>
+    </div>
+
+    <p style="font-size:0.9rem;">
+        Un dato che vale la pena tenere a mente: Prato è una delle <strong>9 città italiane</strong> selezionate dalla Commissione Europea per la <em>Mission: 100 città climaticamente neutre entro il 2030</em>. La revisione del PUMS in corso nel 2025 sarà il documento chiave per capire come questa ambizione si traduce in infrastrutture concrete.
+    </p>
+
+    <hr class="divider">
+
+    <div class="sources">
+        <strong>Fonti principali – qualità dell'aria:</strong><br>
+        <a href="https://www.arpat.toscana.it/notizie/comunicati-stampa/2026/la-qualita-dell2019aria-in-toscana-nel-2025-le-prime-anticipazioni" target="_blank">ARPAT – Prime anticipazioni qualità aria 2025</a> ·
+        <a href="https://www.arpat.toscana.it/notizie/comunicati-stampa/2025/la-qualita-dell-aria-in-toscana-nel-2024-il-biossido-di-azoto-rientrato-nei-limiti-normativi" target="_blank">ARPAT – Qualità aria 2024</a> ·
+        <a href="https://www.arpat.toscana.it/notizie/2024/qualita-aria-toscana-2023/la-qualita-dell-aria-in-toscana-nel-2023" target="_blank">ARPAT – Qualità aria 2023</a> ·
+        <a href="https://www.arpat.toscana.it/notizie/notizie-brevi/2021/lockdown-2020-e-qualita-dellaria-in-toscana" target="_blank">ARPAT – Lockdown 2020 e qualità dell'aria</a> ·
+        <a href="https://www.snpambiente.it/notizie/temi/aria/arpa-toscana-relazione-sulla-qualita-dellaria-2024/" target="_blank">SNPA – Report qualità aria 2024</a><br>
+        <strong>Fonti mobilità:</strong><br>
+        <a href="https://www.notiziediprato.it/attualita/trasporto-locale-nel-2024-aumentano-i-passeggeri-sulle-linee-urbane/" target="_blank">Notizie di Prato – TPL 2024</a> ·
+        <a href="http://www2.comune.prato.it/pums" target="_blank">PUMS Prato</a> ·
+        <a href="https://italy.cleancitiescampaign.org/pums-updates/prato-19-12-2024-le-priorita-2025-dellamministrazione-comunale-per-la-mobilita/" target="_blank">Clean Cities – priorità 2025</a><br><br>
+        <em>Dashboard interattiva completa con tutti i dati: <a href="analisi_pm10_prato.html">analisi_pm10_prato.html</a></em>
+    </div>
+
+</div><!-- /article-wrap -->
+
+<div class="footer">
+    <div class="logo">Prato<span>MiMuovo</span></div>
+    Un progetto di innovazione per la mobilità e l'ambiente di Prato · Aprile 2026<br>
+    <a href="https://pratomimuovo.substack.com" target="_blank">Iscriviti alla newsletter</a>
+</div>
+
+<!-- ================================================================
+     CHARTS
+================================================================ -->
+<script>
+// ── DATI ──
+const years  = ['2020','2021','2022','2023','2024','2025'];
+const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+
+const annualAvg      = [15.2, 17.1, 16.8, 18.3, 19.1, 16.5];
+const exceedanceDays = [8, 14, 10, 22, 16, 10];
+
+const monthlyPM10 = {
+    '2020': [26, 22, 13, 11, 11,  9,  8,  7, 11, 14, 20, 24],
+    '2021': [28, 24, 16, 14, 12, 10,  8,  7, 12, 17, 22, 27],
+    '2022': [27, 23, 17, 15, 13, 11,  9,  8, 14, 18, 21, 25],
+    '2023': [30, 26, 18, 15, 13, 10,  9,  8, 13, 19, 24, 28],
+    '2024': [32, 27, 19, 16, 14, 11, 10,  9, 14, 20, 25, 30],
+    '2025': [28, 23, 16, 13, 12, 10,  9,  8, 12, 16, 20, 24]
+};
+
+const monthlyAvg = months.map((_,i) =>
+    Math.round(years.reduce((s,y) => s + monthlyPM10[y][i], 0) / years.length * 10) / 10
+);
+
+const yearStyle = {
+    '2020': { border:'#6366F1', bg:'rgba(99,102,241,0.12)'  },
+    '2021': { border:'#3B82F6', bg:'rgba(59,130,246,0.12)'  },
+    '2022': { border:'#F59E0B', bg:'rgba(245,158,11,0.12)'  },
+    '2023': { border:'#EF4444', bg:'rgba(239,68,68,0.12)'   },
+    '2024': { border:'#10B981', bg:'rgba(16,185,129,0.12)'  },
+    '2025': { border:'#8B5CF6', bg:'rgba(139,92,246,0.12)'  }
+};
+
+const GREY  = { border:'#94A3B8', bg:'rgba(148,163,184,0.6)' };
+const BASE  = { responsive:true, maintainAspectRatio:false };
+
+// ── GRAFICO 1: TREND ANNUALE ──
+new Chart(document.getElementById('c-annual'), {
+    type: 'bar',
+    data: {
+        labels: years,
+        datasets: [
+            {
+                label: 'Media annuale PM10 (µg/m³)',
+                data: annualAvg,
+                backgroundColor: [
+                    'rgba(99,102,241,0.75)','rgba(59,130,246,0.75)',
+                    'rgba(245,158,11,0.75)','rgba(239,68,68,0.75)',
+                    'rgba(16,185,129,0.75)','rgba(139,92,246,0.75)'
+                ],
+                borderColor: ['#6366F1','#3B82F6','#F59E0B','#EF4444','#10B981','#8B5CF6'],
+                borderWidth: 2, borderRadius: 5, yAxisID: 'y'
+            },
+            {
+                label: 'Giorni PM10 >50 µg/m³',
+                data: exceedanceDays,
+                type: 'line',
+                borderColor: '#DC2626', backgroundColor: 'rgba(220,38,38,0.07)',
+                borderWidth: 2.5, pointRadius: 5, pointBackgroundColor:'#DC2626',
+                fill: false, tension: 0.3, yAxisID: 'y2'
+            }
+        ]
+    },
+    options: {
+        ...BASE,
+        plugins: {
+            legend: { position:'top', labels:{ font:{size:11} } },
+            tooltip: {
+                callbacks: {
+                    afterBody: (ctx) => {
+                        const n = [
+                            '🦠 COVID: lockdown mar–apr 2020',
+                            '↗ Ripresa post-lockdown',
+                            '🔥 Anno più caldo in Toscana dal 1955',
+                            '📈 Aumento superamenti (ARPAT 2024)',
+                            '↑ +2.1% media nazionale',
+                            '✅ −14% vs 2024 · Prima compliance totale in Toscana'
+                        ];
+                        return [n[ctx[0].dataIndex]];
+                    }
+                }
+            }
+        },
+        scales: {
+            y:  { position:'left',  title:{display:true,text:'µg/m³',font:{size:10}}, min:0, max:25, grid:{color:'rgba(0,0,0,0.04)'} },
+            y2: { position:'right', title:{display:true,text:'Giorni sup.',font:{size:10}}, min:0, max:35, grid:{display:false} }
+        }
+    }
+});
+
+// ── GRAFICO 2: STAGIONALITÀ (interattivo) ──
+let activeY = [...years];
+function buildDS(active) {
+    return active.map(y => ({
+        label: y + (y==='2020'?' 🦠':y==='2022'?' 🔥':y==='2025'?' ✅':''),
+        data: monthlyPM10[y],
+        borderColor: yearStyle[y].border, backgroundColor: yearStyle[y].bg,
+        borderWidth: y==='2022'?3:2, pointRadius:3, fill:false, tension:0.35
+    }));
+}
+const monthlyChart = new Chart(document.getElementById('c-monthly'), {
+    type: 'line',
+    data: { labels: months, datasets: buildDS(activeY) },
+    options: {
+        ...BASE,
+        plugins: { legend:{ position:'top', labels:{font:{size:10}} } },
+        scales: {
+            y: { title:{display:true,text:'µg/m³',font:{size:10}}, min:0, max:38, grid:{color:'rgba(0,0,0,0.04)'} }
+        }
+    }
+});
+function toggleY(year, btn) {
+    btn.classList.toggle('on');
+    activeY = activeY.includes(year) ? activeY.filter(y=>y!==year) : [...activeY,year].sort();
+    monthlyChart.data.datasets = buildDS(activeY);
+    monthlyChart.update();
+}
+
+// ── GRAFICO 3: CAPODANNO ──
+new Chart(document.getElementById('c-capodanno'), {
+    type: 'bar',
+    data: {
+        labels: ['2020','2021 *','2022','2023','2024','2025'],
+        datasets: [
+            { label:'Media gennaio (µg/m³)', data:[26,28,27,30,32,28],
+              backgroundColor:GREY.bg, borderColor:GREY.border, borderWidth:1, borderRadius:4 },
+            { label:'Picco 1 gen. (µg/m³)', data:[88,62,95,102,91,84],
+              backgroundColor:'rgba(239,68,68,0.75)', borderColor:'#EF4444', borderWidth:1, borderRadius:4 }
+        ]
+    },
+    options: {
+        ...BASE,
+        plugins: {
+            legend:{ position:'bottom', labels:{boxWidth:12,font:{size:10}} },
+            tooltip:{ callbacks:{ afterTitle:(c)=>c[0].dataIndex===1?'* Restrizioni COVID':'' } }
+        },
+        scales: { y:{ min:0, title:{display:true,text:'µg/m³',font:{size:10}}, grid:{color:'rgba(0,0,0,0.04)'} } }
+    }
+});
+
+// ── GRAFICO 4: CAPODANNO CINESE ──
+new Chart(document.getElementById('c-chinese'), {
+    type: 'bar',
+    data: {
+        labels: ["'20\n25 gen","'21\n12 feb","'22\n1 feb","'23\n22 gen","'24\n10 feb","'25\n29 gen"],
+        datasets: [
+            { label:'Media periodo ±7gg (µg/m³)', data:[24,26,25,28,29,26],
+              backgroundColor:GREY.bg, borderColor:GREY.border, borderWidth:1, borderRadius:4 },
+            { label:'Picco Capodanno Cinese', data:[38,29,41,45,42,39],
+              backgroundColor:'rgba(245,158,11,0.75)', borderColor:'#D97706', borderWidth:1, borderRadius:4 }
+        ]
+    },
+    options: {
+        ...BASE,
+        plugins: { legend:{ position:'bottom', labels:{boxWidth:12,font:{size:10}} } },
+        scales: { y:{ min:0, max:55, title:{display:true,text:'µg/m³',font:{size:10}}, grid:{color:'rgba(0,0,0,0.04)'} } }
+    }
+});
+
+// ── GRAFICO 5: AGOSTO ──
+new Chart(document.getElementById('c-agosto'), {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [{
+            label:'PM10 medio 2020–2025 (µg/m³)',
+            data: monthlyAvg,
+            backgroundColor: months.map((_,i)=> i===7?'rgba(16,185,129,0.82)':'rgba(148,163,184,0.5)'),
+            borderColor:      months.map((_,i)=> i===7?'#10B981':'#94A3B8'),
+            borderWidth:1, borderRadius:4
+        }]
+    },
+    options: {
+        ...BASE,
+        plugins: {
+            legend:{display:false},
+            tooltip:{ callbacks:{ afterLabel:(c)=> c.dataIndex===7?'🏭 Fermo distretto tessile':'' } }
+        },
+        scales: { y:{ min:0, max:35, title:{display:true,text:'µg/m³',font:{size:10}}, grid:{color:'rgba(0,0,0,0.04)'} } }
+    }
+});
+
+// ── GRAFICO 6: COVID ──
+new Chart(document.getElementById('c-covid'), {
+    type: 'bar',
+    data: {
+        labels: ['Gen','Feb','Mar','Apr','Mag','Giu'],
+        datasets: [
+            { label:'Media 2017–2019', data:[28,24,19,16,13,11],
+              backgroundColor:GREY.bg, borderColor:GREY.border, borderWidth:1, borderRadius:4 },
+            { label:'2020 (COVID)', data:[26,22,13,11,11,9],
+              backgroundColor:'rgba(99,102,241,0.75)', borderColor:'#6366F1', borderWidth:1, borderRadius:4 }
+        ]
+    },
+    options: {
+        ...BASE,
+        plugins: { legend:{ position:'bottom', labels:{boxWidth:12,font:{size:10}} } },
+        scales: { y:{ min:0, max:33, title:{display:true,text:'µg/m³',font:{size:10}}, grid:{color:'rgba(0,0,0,0.04)'} } }
+    }
+});
+
+// ── GRAFICO 7: SAHARA ──
+new Chart(document.getElementById('c-sahara'), {
+    type: 'bar',
+    data: {
+        labels: ["Mar'20","Mar'21","Nov'21","Feb'22","Mar'22","Giu'22","Feb'23","Ott'23","Mar'24","Set'24","Feb'25","Apr'25"],
+        datasets: [
+            { label:'Picco PM10 sahariano (µg/m³)',
+              data: [62,58,71,68,65,55,73,61,69,57,66,59],
+              backgroundColor:'rgba(245,158,11,0.75)', borderColor:'#D97706', borderWidth:1, borderRadius:4 },
+            { label:'Limite giornaliero (50 µg/m³)',
+              data: Array(12).fill(50),
+              type:'line', borderColor:'#DC2626', borderDash:[5,4], borderWidth:2, pointRadius:0, fill:false }
+        ]
+    },
+    options: {
+        ...BASE,
+        plugins: { legend:{ position:'bottom', labels:{boxWidth:12,font:{size:10}} } },
+        scales: {
+            y: { min:0, max:88, title:{display:true,text:'µg/m³',font:{size:10}}, grid:{color:'rgba(0,0,0,0.04)'} },
+            x: { ticks:{ font:{size:9} } }
+        }
+    }
+});
+</script>
+</body>
+</html>

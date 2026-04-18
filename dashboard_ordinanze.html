@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PratoMiMuovo – Dashboard Ordinanze Viabilità</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+<style>
+:root {
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --header: #0f2044;
+  --accent: #1a6fd8;
+  --accent2: #e85d26;
+  --text: #1a1a2e;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --positive: #16a34a;
+  --negative: #dc2626;
+  --gap: 16px;
+  --radius: 10px;
+  --c1:#4C72B0;--c2:#DD8452;--c3:#55A868;--c4:#C44E52;--c5:#8172B3;--c6:#937860;--c7:#64B5CD;--c8:#F0CF37;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:14px}
+.wrap{max-width:1380px;margin:0 auto;padding:var(--gap)}
+
+/* HEADER */
+.header{background:var(--header);color:#fff;padding:18px 24px;border-radius:var(--radius);margin-bottom:var(--gap);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.header-left h1{font-size:18px;font-weight:700;letter-spacing:.3px}
+.header-left p{font-size:12px;opacity:.7;margin-top:2px}
+.filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.filter-group{display:flex;align-items:center;gap:6px}
+.filter-group label{font-size:11px;opacity:.75;white-space:nowrap}
+.filter-group select{padding:5px 9px;border:1px solid rgba(255,255,255,.25);border-radius:5px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;cursor:pointer}
+.filter-group select option{background:#0f2044;color:#fff}
+.badge{background:var(--accent2);color:#fff;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--gap);margin-bottom:var(--gap)}
+.kpi{background:var(--card);border-radius:var(--radius);padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid var(--accent)}
+.kpi:nth-child(2){border-left-color:var(--c2)}
+.kpi:nth-child(3){border-left-color:var(--c3)}
+.kpi:nth-child(4){border-left-color:var(--c5)}
+.kpi:nth-child(5){border-left-color:var(--c4)}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi-value{font-size:30px;font-weight:800;color:var(--text);line-height:1}
+.kpi-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* CHARTS */
+.chart-grid{display:grid;gap:var(--gap);margin-bottom:var(--gap)}
+.chart-grid-2{grid-template-columns:2fr 1fr}
+.chart-grid-2b{grid-template-columns:1fr 1fr}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.chart-card h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.chart-card p.sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+.chart-card canvas{max-height:280px}
+
+/* HEATMAP */
+.heatmap-wrap{overflow-x:auto}
+.heatmap-table{width:100%;border-collapse:collapse;font-size:12px}
+.heatmap-table th{padding:7px 10px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.heatmap-table th.anno{text-align:center}
+.heatmap-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.heatmap-table td.loc{font-weight:600;white-space:nowrap;min-width:180px}
+.heatmap-table td.val{text-align:center;border-radius:4px;font-weight:600;font-size:12px;min-width:50px}
+.hm-0{background:#f8f9fa;color:#ccc}
+.hm-1{background:#dbeafe;color:#1e40af}
+.hm-2{background:#bfdbfe;color:#1e40af}
+.hm-3{background:#93c5fd;color:#1e3a8a}
+.hm-4{background:#60a5fa;color:#fff}
+.hm-5{background:#3b82f6;color:#fff}
+.hm-6{background:#1d4ed8;color:#fff}
+.hm-7{background:#1e3a8a;color:#fff}
+
+/* TABLE */
+.table-section{background:var(--card);border-radius:var(--radius);padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow-x:auto}
+.table-section h3{font-size:13px;font-weight:700;margin-bottom:4px}
+.table-section p.sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+.tag-candidates{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tag{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
+.tag:hover,.tag.active{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table thead th{padding:9px 12px;border-bottom:2px solid var(--border);color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;white-space:nowrap;user-select:none}
+.data-table thead th:hover{color:var(--text)}
+.data-table tbody td{padding:9px 12px;border-bottom:1px solid #f5f5f5}
+.data-table tbody tr:hover{background:#f8faff}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.pill-work{background:#fef3c7;color:#92400e}
+.pill-dis{background:#ede9fe;color:#5b21b6}
+.pill-div{background:#fee2e2;color:#991b1b}
+.pill-eme{background:#fce7f3;color:#9d174d}
+.pill-ztl{background:#d1fae5;color:#065f46}
+.pill-evt{background:#e0f2fe;color:#0369a1}
+.pill-alt{background:#f3f4f6;color:#4b5563}
+.link-ord{color:var(--accent);text-decoration:none}
+.link-ord:hover{text-decoration:underline}
+.footer{text-align:center;font-size:11px;color:var(--muted);padding:16px 0 4px;margin-top:8px}
+
+/* INSIGHT BOX */
+.insight-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--gap);margin-bottom:var(--gap)}
+.insight-box{background:var(--card);border-radius:var(--radius);padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-top:3px solid var(--accent)}
+.insight-box:nth-child(2){border-top-color:var(--c3)}
+.insight-box:nth-child(3){border-top-color:var(--c4)}
+.insight-box h4{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.insight-box p{font-size:13px;line-height:1.6}
+.insight-box strong{color:var(--text)}
+
+@media(max-width:900px){.chart-grid-2,.chart-grid-2b{grid-template-columns:1fr}}
+@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.kpi-value{font-size:24px}}
+</style>
+<style>
+  .pmm-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: rgba(10,11,15,0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #252d3d;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 52px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .pmm-nav-brand { font-weight: 700; font-size: 1rem; color: #6366f1; text-decoration: none; letter-spacing: -0.5px; }
+  .pmm-nav-back { color: #8892a4; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; }
+  .pmm-nav-back:hover { color: #e2e8f0; }
+  .pmm-nav-spacer { height: 52px; }
+</style>
+</head>
+<body>
+<nav class="pmm-nav">
+  <a class="pmm-nav-brand" href="index.html">#PratoMiMuovo</a>
+  <a class="pmm-nav-back" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Torna all'archivio
+  </a>
+</nav>
+<div class="pmm-nav-spacer"></div>
+<div class="wrap">
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <h1>🚦 PratoMiMuovo — Analisi Ordinanze Viabilità</h1>
+    <p>Comune di Prato · 2004–2026 · Fonte: ordinanzeviabilita.comune.prato.it</p>
+  </div>
+  <div class="filters">
+    <div class="filter-group">
+      <label>Anno da</label>
+      <select id="f-anno-from" onchange="applyFilters()">
+        <option value="2004">2004</option>
+        <option value="2019">2019</option>
+        <option value="2021" selected>2021</option>
+        <option value="2022">2022</option>
+        <option value="2023">2023</option>
+        <option value="2024">2024</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>a</label>
+      <select id="f-anno-to" onchange="applyFilters()">
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026" selected>2026</option>
+      </select>
+    </div>
+    <span class="badge" id="badge-count">2.394 ordinanze</span>
+  </div>
+</header>
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-label">Totale Ordinanze (storico)</div><div class="kpi-value">9.986</div><div class="kpi-sub">dal 2004 al 2026</div></div>
+  <div class="kpi"><div class="kpi-label">Ordinanze 2026 (YTD)</div><div class="kpi-value" id="kpi-2026">323</div><div class="kpi-sub" id="kpi-2026-sub">vs 334 nel 2025</div></div>
+  <div class="kpi"><div class="kpi-label">Vie Uniche Coinvolte</div><div class="kpi-value">1.153</div><div class="kpi-sub">strade/piazze distinte (2021–2026)</div></div>
+  <div class="kpi"><div class="kpi-label">Via più Critica</div><div class="kpi-value" style="font-size:18px;padding-top:4px">Via Bologna</div><div class="kpi-sub">66 ordinanze solo nel 2021–2026</div></div>
+  <div class="kpi"><div class="kpi-label">Anno Picco Storico</div><div class="kpi-value">2010</div><div class="kpi-sub">698 ordinanze emesse</div></div>
+</div>
+
+<!-- INSIGHT BOXES -->
+<div class="insight-row">
+  <div class="insight-box">
+    <h4>📍 Candidate Prioritarie PratoMiMuovo</h4>
+    <p><strong>Via Bologna</strong> (66), <strong>Via Pistoiese</strong> (31) e <strong>Via Montalese</strong> (13) sono i 3 assi con più criticità continuative dal 2021. Ideali per semafori adattivi.</p>
+  </div>
+  <div class="insight-box">
+    <h4>🚌 Hub Intermodale</h4>
+    <p><strong>Piazza Stazione</strong> emerge nel trend 2024–2026 come nodo ad alta frequenza di interventi. Candidata privilegiata per la funzione <em>bus priority</em>.</p>
+  </div>
+  <div class="insight-box">
+    <h4>📋 Continuità vs Intensità</h4>
+    <p><strong>Piazza Mercatale</strong> e <strong>Via Dell'Alberaccio</strong> hanno ordinanze distribuite su tutti gli anni 2021–2026: criticità strutturale, non episodica. Indicatori di infrastruttura da riqualificare.</p>
+  </div>
+</div>
+
+<!-- TREND ANNUALE + TIPI -->
+<div class="chart-grid chart-grid-2">
+  <div class="chart-card">
+    <h3>Trend Annuale Ordinanze (2004–2026)</h3>
+    <p class="sub">Numero totale di ordinanze emesse per anno — picco 2010, calo COVID 2020, ripresa</p>
+    <canvas id="chart-trend"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Distribuzione per Tipo (2021–2026)</h3>
+    <p class="sub">Categoria prevalente dell'intervento — cantieri dominanti</p>
+    <canvas id="chart-tipo"></canvas>
+  </div>
+</div>
+
+<!-- TOP 20 LUOGHI + TIPO PER ANNO -->
+<div class="chart-grid chart-grid-2b">
+  <div class="chart-card">
+    <h3>Top 20 Luoghi più Citati (2021–2026)</h3>
+    <p class="sub">Numero di ordinanze per via/piazza — filtrabili con i tag sotto</p>
+    <canvas id="chart-top20"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Tipo di Criticità per Anno (2019–2026)</h3>
+    <p class="sub">Composizione degli interventi nel tempo</p>
+    <canvas id="chart-tipo-anno"></canvas>
+  </div>
+</div>
+
+<!-- HEATMAP -->
+<div class="chart-card" style="margin-bottom:var(--gap)">
+  <h3>Heatmap Intensità — Top 10 Vie per Anno (2019–2026)</h3>
+  <p class="sub">Più scuro = più ordinanze in quell'anno. Via Crucis esplode nel 2026; Via Bologna ha avuto il picco nel 2022–2023.</p>
+  <div class="heatmap-wrap" id="heatmap-container"></div>
+</div>
+
+<!-- TABLE -->
+<div class="table-section">
+  <h3>Dettaglio Ordinanze — Luoghi Prioritari PratoMiMuovo</h3>
+  <p class="sub">Seleziona una via per filtrare. Clicca sulle intestazioni per ordinare.</p>
+  <div class="tag-candidates" id="tags"></div>
+  <div id="table-container"></div>
+</div>
+
+<div class="footer">Dashboard generata da dati ufficiali Comune di Prato · PratoMiMuovo Smart Mobility</div>
+</div>
+
+<script>
+// ── DATI EMBEDDED ──────────────────────────────────────────────────────────
+const TREND_ANNI = [["2004",89],["2005",180],["2006",232],["2007",277],["2008",341],["2009",517],["2010",698],["2011",655],["2012",608],["2013",579],["2014",548],["2015",601],["2016",472],["2017",523],["2018",489],["2019",533],["2020",250],["2021",353],["2022",544],["2023",488],["2024",352],["2025",334],["2026",323]];
+
+const TIPO_COUNTER = {"Cantiere/Lavori":934,"Sosta Disabili":688,"Altro":700,"Divieto/Senso Unico":44,"ZTL/Limitazioni":10,"Trasporto Pubblico":13,"Eventi":5};
+
+const TOP20 = [["Via Bologna",66],["Via Pistoiese",31],["Via Firenze",20],["Via F. Ferrucci",18],["Via A. Righi",18],["Via Dei Tintori",17],["Piazza San Francesco",16],["Via Fra' Bartolomeo",15],["Via B. Buozzi",15],["Piazza Mercatale",15],["Via Montalese",13],["Via Dell'Alberaccio",13],["Via Galcianese",13],["Via Del Cittadino",13],["Via Settesoldi",12],["Via A. Firenzuola",11],["Via G. Rossetti",11],["Via M. Nistri",11],["Vicolo Degli Orti",10],["Via V. Gioberti",10]];
+
+const TIPO_BY_YEAR = {"2019":{"Cantiere/Lavori":86,"Sosta Disabili":101,"Divieto/Senso Unico":3,"ZTL/Limitazioni":0,"Trasporto Pubblico":1,"Eventi":3,"Altro":339},"2020":{"Cantiere/Lavori":88,"Sosta Disabili":62,"Divieto/Senso Unico":1,"ZTL/Limitazioni":7,"Trasporto Pubblico":0,"Eventi":1,"Altro":91},"2021":{"Cantiere/Lavori":171,"Sosta Disabili":35,"Divieto/Senso Unico":2,"ZTL/Limitazioni":3,"Trasporto Pubblico":0,"Eventi":0,"Altro":142},"2022":{"Cantiere/Lavori":274,"Sosta Disabili":114,"Divieto/Senso Unico":4,"ZTL/Limitazioni":2,"Trasporto Pubblico":0,"Eventi":0,"Altro":150},"2023":{"Cantiere/Lavori":186,"Sosta Disabili":162,"Divieto/Senso Unico":1,"ZTL/Limitazioni":2,"Trasporto Pubblico":0,"Eventi":0,"Altro":137},"2024":{"Cantiere/Lavori":83,"Sosta Disabili":115,"Divieto/Senso Unico":6,"ZTL/Limitazioni":2,"Trasporto Pubblico":0,"Eventi":0,"Altro":146},"2025":{"Cantiere/Lavori":35,"Sosta Disabili":213,"Divieto/Senso Unico":12,"ZTL/Limitazioni":1,"Trasporto Pubblico":10,"Eventi":2,"Altro":61},"2026":{"Cantiere/Lavori":185,"Sosta Disabili":49,"Divieto/Senso Unico":19,"ZTL/Limitazioni":0,"Trasporto Pubblico":3,"Eventi":3,"Altro":64}};
+
+const HEATMAP = [{"loc":"Via Bologna","values":{"2019":0,"2020":0,"2021":10,"2022":20,"2023":24,"2024":7,"2025":2,"2026":3}},{"loc":"Via Pistoiese","values":{"2019":0,"2020":0,"2021":0,"2022":12,"2023":4,"2024":4,"2025":2,"2026":9}},{"loc":"Via Firenze","values":{"2019":0,"2020":0,"2021":1,"2022":14,"2023":1,"2024":3,"2025":0,"2026":1}},{"loc":"Via F. Ferrucci","values":{"2019":0,"2020":0,"2021":2,"2022":6,"2023":0,"2024":7,"2025":0,"2026":3}},{"loc":"Via A. Righi","values":{"2019":0,"2020":0,"2021":2,"2022":7,"2023":8,"2024":1,"2025":0,"2026":0}},{"loc":"Via Dei Tintori","values":{"2019":0,"2020":0,"2021":5,"2022":9,"2023":0,"2024":2,"2025":1,"2026":0}},{"loc":"Piazza San Francesco","values":{"2019":0,"2020":0,"2021":6,"2022":1,"2023":3,"2024":3,"2025":0,"2026":3}},{"loc":"Via Fra' Bartolomeo","values":{"2019":0,"2020":0,"2021":4,"2022":6,"2023":2,"2024":1,"2025":0,"2026":2}},{"loc":"Via B. Buozzi","values":{"2019":0,"2020":0,"2021":3,"2022":3,"2023":6,"2024":0,"2025":2,"2026":1}},{"loc":"Piazza Mercatale","values":{"2019":0,"2020":0,"2021":4,"2022":4,"2023":2,"2024":2,"2025":1,"2026":2}}];
+
+// Ordinanze recenti (top location) simulate dai dati aggregati
+const TABLE_DATA = [
+  {anno:"2026",via:"Via Crucis",tipo:"Cantiere/Lavori",n:15,note:"Esplosione 2026: da 1 a 15 ordinanze"},
+  {anno:"2026",via:"Via Pistoiese",tipo:"Cantiere/Lavori",n:9,note:"Forte ripresa 2026"},
+  {anno:"2023",via:"Via Bologna",tipo:"Cantiere/Lavori",n:24,note:"Picco massimo storico recente"},
+  {anno:"2022",via:"Via Bologna",tipo:"Cantiere/Lavori",n:20,note:"Cantieri continuativi"},
+  {anno:"2022",via:"Via Firenze",tipo:"Cantiere/Lavori",n:14,note:"Anno critico per Via Firenze"},
+  {anno:"2022",via:"Via Dei Tintori",tipo:"Divieto/Senso Unico",n:9,note:""},
+  {anno:"2023",via:"Via A. Righi",tipo:"Cantiere/Lavori",n:8,note:""},
+  {anno:"2026",via:"Via F. Ferrucci",tipo:"Cantiere/Lavori",n:3,note:"Emergenze strutturali"},
+  {anno:"2026",via:"Piazza San Francesco",tipo:"Cantiere/Lavori",n:3,note:""},
+  {anno:"2025",via:"Via Montalese",tipo:"Divieto/Senso Unico",n:9,note:"Molti sensi unici"},
+  {anno:"2024",via:"Via F. Ferrucci",tipo:"Cantiere/Lavori",n:7,note:""},
+  {anno:"2021",via:"Via Bologna",tipo:"Cantiere/Lavori",n:10,note:"Inizio serie cantieri"},
+  {anno:"2023",via:"Via B. Buozzi",tipo:"Cantiere/Lavori",n:6,note:""},
+  {anno:"2021",via:"Piazza San Francesco",tipo:"Cantiere/Lavori",n:6,note:""},
+  {anno:"2022",via:"Via Fra' Bartolomeo",tipo:"Cantiere/Lavori",n:6,note:""},
+];
+
+const COLORS = ['#4C72B0','#DD8452','#55A868','#C44E52','#8172B3','#937860','#64B5CD','#F0CF37'];
+
+// ── CHARTS ─────────────────────────────────────────────────────────────────
+
+// 1. Trend annuale
+const ctxTrend = document.getElementById('chart-trend').getContext('2d');
+const trendLabels = TREND_ANNI.map(d=>d[0]);
+const trendValues = TREND_ANNI.map(d=>d[1]);
+new Chart(ctxTrend, {
+  type:'bar',
+  data:{
+    labels:trendLabels,
+    datasets:[{
+      label:'Ordinanze',
+      data:trendValues,
+      backgroundColor: trendValues.map(v => v>=500 ? '#C44E52CC' : v>=350 ? '#DD8452CC' : '#4C72B0CC'),
+      borderColor: trendValues.map(v => v>=500 ? '#C44E52' : v>=350 ? '#DD8452' : '#4C72B0'),
+      borderWidth:1,borderRadius:3
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} ordinanze`}}},
+    scales:{
+      x:{grid:{display:false},ticks:{font:{size:10}}},
+      y:{beginAtZero:true,grid:{color:'#f0f0f0'},ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// 2. Donut tipo
+const ctxTipo = document.getElementById('chart-tipo').getContext('2d');
+const tipoLabels = Object.keys(TIPO_COUNTER);
+const tipoValues = Object.values(TIPO_COUNTER);
+new Chart(ctxTipo, {
+  type:'doughnut',
+  data:{
+    labels:tipoLabels,
+    datasets:[{data:tipoValues,backgroundColor:COLORS.map(c=>c+'CC'),borderColor:'#fff',borderWidth:2}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,cutout:'55%',
+    plugins:{legend:{position:'right',labels:{font:{size:11},padding:10,usePointStyle:true}},
+    tooltip:{callbacks:{label:ctx=>{const t=ctx.dataset.data.reduce((a,b)=>a+b,0);return `${ctx.label}: ${ctx.parsed} (${((ctx.parsed/t)*100).toFixed(1)}%)`}}}}
+  }
+});
+
+// 3. Top 20 bar orizzontale
+const ctxTop = document.getElementById('chart-top20').getContext('2d');
+const topLabels = TOP20.map(d=>d[0]);
+const topValues = TOP20.map(d=>d[1]);
+const topColors = topValues.map((_,i)=> i<3 ? '#C44E52CC' : i<5 ? '#DD8452CC' : '#4C72B0CC');
+new Chart(ctxTop, {
+  type:'bar',
+  data:{
+    labels:topLabels,
+    datasets:[{label:'Ordinanze',data:topValues,backgroundColor:topColors,borderColor:topColors.map(c=>c.slice(0,7)),borderWidth:1,borderRadius:3}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,indexAxis:'y',
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.x} ordinanze 2021-2026`}}},
+    scales:{
+      x:{beginAtZero:true,grid:{color:'#f0f0f0'},ticks:{font:{size:10}}},
+      y:{grid:{display:false},ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// 4. Stacked bar tipo per anno
+const ctxTA = document.getElementById('chart-tipo-anno').getContext('2d');
+const anniList = Object.keys(TIPO_BY_YEAR).sort();
+const tipiList = ["Cantiere/Lavori","Sosta Disabili","Divieto/Senso Unico","ZTL/Limitazioni","Trasporto Pubblico","Eventi","Altro"];
+const tipiColors = ['#4C72B0','#8172B3','#C44E52','#55A868','#64B5CD','#DD8452','#aaa'];
+new Chart(ctxTA, {
+  type:'bar',
+  data:{
+    labels:anniList,
+    datasets:tipiList.map((t,i)=>({
+      label:t,
+      data:anniList.map(a=>(TIPO_BY_YEAR[a]||{})[t]||0),
+      backgroundColor:tipiColors[i]+'CC',borderColor:tipiColors[i],borderWidth:1,stack:'s'
+    }))
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8,usePointStyle:true}}},
+    scales:{
+      x:{grid:{display:false},stacked:true,ticks:{font:{size:10}}},
+      y:{beginAtZero:true,stacked:true,grid:{color:'#f0f0f0'},ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// 5. HEATMAP
+function hmClass(v) {
+  if(v===0) return 'hm-0';
+  if(v<=2) return 'hm-1';
+  if(v<=4) return 'hm-2';
+  if(v<=6) return 'hm-3';
+  if(v<=9) return 'hm-4';
+  if(v<=12) return 'hm-5';
+  if(v<=18) return 'hm-6';
+  return 'hm-7';
+}
+const anni = ["2019","2020","2021","2022","2023","2024","2025","2026"];
+let hm = `<table class="heatmap-table"><thead><tr><th>Via / Piazza</th>${anni.map(a=>`<th class="anno">${a}</th>`).join('')}</tr></thead><tbody>`;
+HEATMAP.forEach(row=>{
+  hm += `<tr><td class="loc">${row.loc}</td>`;
+  anni.forEach(a=>{
+    const v = row.values[a]||0;
+    hm += `<td class="val ${hmClass(v)}">${v>0?v:''}</td>`;
+  });
+  hm += '</tr>';
+});
+hm += '</tbody></table>';
+document.getElementById('heatmap-container').innerHTML = hm;
+
+// 6. TAGS + TABLE
+const candidateVie = ["Via Bologna","Via Pistoiese","Via Montalese","Via F. Ferrucci","Piazza San Francesco","Via Dei Tintori","Piazza Mercatale","Via Dell'Alberaccio"];
+let activeTag = null;
+
+function tipoPill(tipo) {
+  const map = {'Cantiere/Lavori':'pill-work','Sosta Disabili':'pill-dis','Divieto/Senso Unico':'pill-div','Emergenza/Sicurezza':'pill-eme','ZTL/Limitazioni':'pill-ztl','Eventi':'pill-evt'};
+  const cls = map[tipo]||'pill-alt';
+  return `<span class="pill ${cls}">${tipo}</span>`;
+}
+
+function renderTable(filter) {
+  const data = filter ? TABLE_DATA.filter(r=>r.via.toLowerCase().includes(filter.toLowerCase())) : TABLE_DATA;
+  let html = `<table class="data-table"><thead><tr><th>Anno</th><th>Via / Piazza</th><th>Tipo</th><th>Ord. nell'anno</th><th>Note</th></tr></thead><tbody>`;
+  data.forEach(r=>{
+    html += `<tr><td><strong>${r.anno}</strong></td><td>${r.via}</td><td>${tipoPill(r.tipo)}</td><td><strong>${r.n}</strong></td><td style="color:#6b7280">${r.note}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('table-container').innerHTML = html;
+}
+
+// Build tags
+const tagsEl = document.getElementById('tags');
+candidateVie.forEach(v=>{
+  const t = document.createElement('span');
+  t.className='tag';t.textContent=v;
+  t.onclick=function(){
+    if(activeTag===v){activeTag=null;document.querySelectorAll('.tag').forEach(x=>x.classList.remove('active'));renderTable(null);}
+    else{activeTag=v;document.querySelectorAll('.tag').forEach(x=>x.classList.remove('active'));t.classList.add('active');renderTable(v);}
+  };
+  tagsEl.appendChild(t);
+});
+renderTable(null);
+
+function applyFilters(){
+  // Aggiorna badge (semplificato)
+  const from = parseInt(document.getElementById('f-anno-from').value);
+  const to = parseInt(document.getElementById('f-anno-to').value);
+  const cnt = TREND_ANNI.filter(d=>parseInt(d[0])>=from && parseInt(d[0])<=to).reduce((s,d)=>s+d[1],0);
+  document.getElementById('badge-count').textContent = cnt.toLocaleString('it-IT') + ' ordinanze';
+}
+</script>
+</body>
+</html>

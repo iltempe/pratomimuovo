@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>#PratoMiMuovo — Archivio del Progetto</title>
+  <style>
+    :root {
+      --bg: #0a0b0f;
+      --bg2: #111318;
+      --bg3: #181c24;
+      --card: #1a1f2e;
+      --border: #252d3d;
+      --accent: #6366f1;
+      --accent2: #06b6d4;
+      --accent3: #a855f7;
+      --text: #e2e8f0;
+      --text-muted: #8892a4;
+      --text-faint: #4a5568;
+      --green: #10b981;
+      --orange: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10, 11, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+    }
+    .nav-brand {
+      font-weight: 700; font-size: 1.1rem; color: var(--accent);
+      text-decoration: none; letter-spacing: -0.5px;
+    }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted); text-decoration: none;
+      font-size: 0.875rem; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO IMAGE ── */
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .hero-image-wrap {
+      position: relative;
+    }
+    .hero-image-wrap::before {
+      content: '';
+      position: absolute; inset: -12px;
+      background: radial-gradient(ellipse at center, rgba(99,102,241,0.2) 0%, transparent 70%);
+      border-radius: 20px;
+      pointer-events: none;
+    }
+    .hero-image-wrap img {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 40px rgba(99,102,241,0.15);
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-image-wrap { order: -1; max-width: 400px; margin: 0 auto; }
+    }
+
+    /* ── SECTIONS ── */
+    section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--accent2);
+      margin-bottom: 0.75rem;
+    }
+    h2 {
+      font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+    }
+    .section-desc { color: var(--text-muted); max-width: 600px; margin-bottom: 2.5rem; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding-top: 80px;
+      position: relative; overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(99,102,241,0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 40% at 80% 80%, rgba(6,182,212,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+      color: var(--accent); padding: 0.3rem 0.9rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 1.5rem;
+    }
+    #hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800; letter-spacing: -2px; line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    #hero h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 1.2rem; color: var(--text-muted);
+      max-width: 620px; margin-bottom: 2.5rem; line-height: 1.7;
+    }
+    .hero-pills { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 3rem; }
+    .pill {
+      background: var(--card); border: 1px solid var(--border);
+      padding: 0.4rem 1rem; border-radius: 20px;
+      font-size: 0.8rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .hero-scroll {
+      display: flex; align-items: center; gap: 0.5rem;
+      color: var(--text-faint); font-size: 0.8rem;
+    }
+    .hero-scroll svg { animation: bounce 2s infinite; }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+
+    /* ── CARDS GRID ── */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .card-icon.purple { background: rgba(99,102,241,0.15); }
+    .card-icon.cyan   { background: rgba(6,182,212,0.15); }
+    .card-icon.violet { background: rgba(168,85,247,0.15); }
+    .card-icon.green  { background: rgba(16,185,129,0.15); }
+    .card-icon.orange { background: rgba(245,158,11,0.15); }
+    .card h3 { font-size: 1rem; font-weight: 600; }
+    .card p { font-size: 0.85rem; color: var(--text-muted); flex: 1; }
+    .card-badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 600;
+      padding: 0.2rem 0.6rem; border-radius: 6px; margin-top: 0.25rem;
+    }
+    .badge-pdf { background: rgba(239,68,68,0.15); color: #f87171; }
+    .badge-docx { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .badge-html { background: rgba(16,185,129,0.15); color: #34d399; }
+    .badge-md   { background: rgba(168,85,247,0.15); color: #c084fc; }
+
+    /* ── DIAGRAMMI ── */
+    .img-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .img-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      cursor: pointer; transition: border-color 0.2s, transform 0.2s;
+    }
+    .img-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+    .img-card img { width: 100%; display: block; object-fit: cover; max-height: 200px; }
+    .img-card-label {
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem; color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+    .img-card-label strong { color: var(--text); display: block; font-size: 0.875rem; margin-bottom: 0.1rem; }
+
+    /* ── LIGHTBOX ── */
+    #lightbox {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.92); align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+
+    /* ── POST ── */
+    .post-accordion { display: flex; flex-direction: column; gap: 1rem; }
+    .post-item {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden;
+    }
+    .post-header {
+      padding: 1.25rem 1.5rem; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.2s;
+    }
+    .post-header:hover { background: var(--bg3); }
+    .post-header h3 { font-size: 1rem; font-weight: 600; flex: 1; padding-right: 1rem; }
+    .post-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .post-chevron { color: var(--text-muted); transition: transform 0.2s; flex-shrink: 0; }
+    .post-item.open .post-chevron { transform: rotate(180deg); }
+    .post-body {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+    }
+    .post-item.open .post-body { max-height: 3000px; }
+    .post-content {
+      padding: 0 1.5rem 1.5rem; border-top: 1px solid var(--border);
+      font-size: 0.9rem; line-height: 1.8; color: var(--text-muted);
+    }
+    .post-content h2, .post-content h3 {
+      color: var(--text); margin: 1.5rem 0 0.5rem; font-size: 1rem;
+    }
+    .post-content p { margin-bottom: 0.75rem; }
+    .post-content strong { color: var(--text); }
+    .post-content em { color: var(--text-muted); }
+    .post-content hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+
+    /* ── FEATURES STRIP ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem; margin-top: 2rem;
+    }
+    .feature {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem;
+    }
+    .feature-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .feature h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .feature p { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* ── CHI SONO ── */
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem; margin-top: 1rem;
+    }
+    .social-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .social-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .social-icon {
+      width: 46px; height: 46px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .social-info { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
+    .social-name { font-weight: 600; font-size: 0.95rem; }
+    .social-handle { font-size: 0.78rem; color: var(--text-muted); }
+    .social-arrow { color: var(--text-faint); flex-shrink: 0; }
+    .social-card:hover .social-arrow { color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg2); border-top: 1px solid var(--border);
+      text-align: center; padding: 2rem;
+      color: var(--text-faint); font-size: 0.8rem;
+    }
+    footer strong { color: var(--accent); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#hero">#PratoMiMuovo</a>
+  <ul class="nav-links">
+    <li><a href="#progetto">Progetto</a></li>
+    <li><a href="#documenti">Documenti</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#architettura">Architettura</a></li>
+    <li><a href="#comunicazione">Comunicazione</a></li>
+    <li><a href="#chisono">Chi sono</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-tag">Smart Mobility · Prato</div>
+      <h1>La città che si muove<br/><span>con intelligenza.</span></h1>
+      <p class="hero-subtitle">
+        Un progetto di innovazione civica per trasformare la mobilità urbana di Prato —
+        semafori adattivi, sensori IoT, dati aperti, protocolli europei. Senza vendor lock-in.
+      </p>
+      <div class="hero-pills">
+        <span class="pill"><span class="dot"></span> Semafori adattivi</span>
+        <span class="pill"><span class="dot"></span> Bus Priority</span>
+        <span class="pill"><span class="dot"></span> Pedestrian Extension</span>
+        <span class="pill"><span class="dot"></span> Environmental TM</span>
+        <span class="pill"><span class="dot"></span> Open Data</span>
+        <span class="pill"><span class="dot"></span> LoRaWAN · DATEX II · MQTT</span>
+      </div>
+      <div class="hero-scroll">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+        Scorri per esplorare l'archivio
+      </div>
+    </div>
+    <div class="hero-image-wrap">
+      <img src="hero.svg" alt="PratoMiMuovo — rete di mobilità intelligente" />
+    </div>
+  </div>
+</section>
+
+<!-- IL PROGETTO -->
+<section id="progetto">
+  <div class="section-label">Overview</div>
+  <h2>Il progetto</h2>
+  <p class="section-desc">
+    Prato come organismo vivente: Occhi (sensori), Cervello (IA), Muscoli (semafori dinamici).
+    Passare da città statica a città reattiva — con costi dieci volte inferiori alle opere tradizionali.
+  </p>
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">👁️</div>
+      <h4>Occhi — Sensori</h4>
+      <p>Telecamere di conteggio, spire nell'asfalto, GPS bus LAM. Nessuna identificazione, privacy garantita.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🧠</div>
+      <h4>Cervello — IA centrale</h4>
+      <p>Software che raccoglie dati ogni secondo e decide durate di verde ottimali in tempo reale.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">💪</div>
+      <h4>Muscoli — Attuatori</h4>
+      <p>Semafori che cambiano comportamento in base alla realtà, non all'orologio. PMV, illuminazione adattiva.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🌿</div>
+      <h4>Environmental TM</h4>
+      <p>Integrazione dati ARPAT: deviazione automatica del traffico nei picchi di PM10/NO2.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🚲</div>
+      <h4>Verde Anticipato Bici</h4>
+      <p>4-5 secondi di anticipo per i ciclisti — sicurezza attiva, non solo teorica.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔓</div>
+      <h4>Open standard</h4>
+      <p>LoRaWAN, DATEX II (compatibile Google Maps), MQTT. Nessun vendor lock-in.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DOCUMENTI -->
+<section id="documenti">
+  <div class="section-label">Archivio</div>
+  <h2>Documenti</h2>
+  <p class="section-desc">Tutta la documentazione strategica e tecnica del progetto, disponibile per il download.</p>
+  <div class="cards">
+
+    <a class="card" href="PratoMiMuovo_QCD_v2.0.docx" target="_blank">
+      <div class="card-icon cyan">📋</div>
+      <div>
+        <h3>QCD v2.0 — Quadro di Contesto e Definizione</h3>
+        <span class="card-badge badge-docx">DOCX</span>
+      </div>
+      <p>Il documento strategico aggiornato: perché, cosa e per chi. Analisi del contesto, obiettivi e stakeholder.</p>
+    </a>
+
+    <a class="card" href="PratoMiMuovo_Specifica_Tecnica_v1.0.docx" target="_blank">
+      <div class="card-icon violet">⚙️</div>
+      <div>
+        <h3>Specifica Tecnica v1.0</h3>
+        <span class="card-badge badge-docx">DOCX</span>
+      </div>
+      <p>Architettura del sistema, protocolli di comunicazione, funzionalità nel dettaglio tecnico.</p>
+    </a>
+
+  </div>
+</section>
+
+<!-- DEMO & DASHBOARD -->
+<section id="demo">
+  <div class="section-label">Interattivo</div>
+  <h2>Demo &amp; Dashboard</h2>
+  <p class="section-desc">Pagine interattive prodotte durante il progetto — aprono in una nuova scheda.</p>
+  <div class="cards">
+
+    <a class="card" href="dashboard_ordinanze.html" target="_blank">
+      <div class="card-icon cyan">📊</div>
+      <div>
+        <h3>Dashboard Ordinanze</h3>
+        <span class="card-badge badge-html">HTML</span>
+      </div>
+      <p>Visualizzazione interattiva di 10.000+ ordinanze di viabilità del Comune di Prato (2004-2026). Trend, top vie, heatmap.</p>
+    </a>
+
+    <a class="card" href="https://iltempe.github.io/pratomimuovo-traffico/" target="_blank">
+      <div class="card-icon green">🗺️</div>
+      <div>
+        <h3>Dati Traffico Prato</h3>
+        <span class="card-badge badge-html">Web</span>
+      </div>
+      <p>Visualizzazione live dei dati di traffico sulla rete stradale pratese — dati aggiornati in tempo reale.</p>
+    </a>
+
+    <a class="card" href="https://iltempe.github.io/pratomimuovo_incidenti/" target="_blank">
+      <div class="card-icon violet">🚨</div>
+      <div>
+        <h3>Dati Incidenti Prato</h3>
+        <span class="card-badge badge-html">Web</span>
+      </div>
+      <p>Analisi e visualizzazione degli incidenti stradali nel territorio pratese — dati georeferenziati.</p>
+    </a>
+
+    <a class="card" href="grafici_substack_embed.html" target="_blank">
+      <div class="card-icon orange">📈</div>
+      <div>
+        <h3>Grafici Ordinanze (embed)</h3>
+        <span class="card-badge badge-html">HTML</span>
+      </div>
+      <p>Versione ottimizzata dei grafici sulle ordinanze, pensata per l'embedding su Substack.</p>
+    </a>
+
+  </div>
+</section>
+
+<!-- ARCHITETTURA -->
+<section id="architettura">
+  <div class="section-label">Diagrammi</div>
+  <h2>Architettura del sistema</h2>
+  <p class="section-desc">Diagrammi di architettura e sequenza. Clicca su un'immagine per ingrandirla.</p>
+  <div class="img-grid">
+
+    <div class="img-card" onclick="openLightbox('arch_sistema.png')">
+      <img src="arch_sistema.png" alt="Architettura di sistema" />
+      <div class="img-card-label">
+        <strong>Architettura di sistema</strong>
+        Vista complessiva dell'architettura — sensori, IA centrale, attuatori e protocolli
+      </div>
+    </div>
+
+    <div class="img-card" onclick="openLightbox('seq_pedestrian_extension.png')">
+      <img src="seq_pedestrian_extension.png" alt="Pedestrian Extension" />
+      <div class="img-card-label">
+        <strong>Pedestrian Extension</strong>
+        Sequenza del prolungamento rosso per pedone ancora in attraversamento
+      </div>
+    </div>
+
+    <div class="img-card" onclick="openLightbox('seq_environmental_tm.png')">
+      <img src="seq_environmental_tm.png" alt="Environmental Traffic Management" />
+      <div class="img-card-label">
+        <strong>Environmental Traffic Management</strong>
+        Integrazione ARPAT per deviazione traffico in caso di picchi PM10/NO2
+      </div>
+    </div>
+
+    <div class="img-card" onclick="openLightbox('seq_bus_priority.png')">
+      <img src="seq_bus_priority.png" alt="Bus Priority" />
+      <div class="img-card-label">
+        <strong>Bus Priority</strong>
+        Sequenza del sistema di priorità semaforica per autobus LAM
+      </div>
+    </div>
+
+    <a class="img-card" href="dashboard_ordinanze.html" target="_blank" style="text-decoration:none;color:inherit;">
+      <img src="grafico1_trend_annuale.png" alt="Trend ordinanze annuale" />
+      <div class="img-card-label">
+        <strong>Trend ordinanze 2004–2026 ↗</strong>
+        Grafico interattivo — quasi 10.000 ordinanze anno per anno
+      </div>
+    </a>
+
+    <a class="img-card" href="dashboard_ordinanze.html" target="_blank" style="text-decoration:none;color:inherit;">
+      <img src="grafico2_top_vie.png" alt="Top vie per ordinanze" />
+      <div class="img-card-label">
+        <strong>Top vie per ordinanze ↗</strong>
+        Grafico interattivo — Via Bologna in testa con 66 ordinanze
+      </div>
+    </a>
+
+    <a class="img-card" href="dashboard_ordinanze.html" target="_blank" style="text-decoration:none;color:inherit;">
+      <img src="grafico3_heatmap.png" alt="Heatmap vie/anni" />
+      <div class="img-card-label">
+        <strong>Heatmap intensità interventi ↗</strong>
+        Grafico interattivo — ordinanze per via e per anno
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- COMUNICAZIONE -->
+<section id="comunicazione">
+  <div class="section-label">Testi</div>
+  <h2>Comunicazione</h2>
+  <p class="section-desc">Newsletter e post già prodotti per il progetto — espandi per leggere il testo completo.</p>
+
+  <div class="post-accordion">
+
+    <!-- POST 1 -->
+    <div class="post-item" id="post1">
+      <div class="post-header" onclick="togglePost('post1')">
+        <div>
+          <h3>Prato, il traffico non si risolve allargando le strade — si risolve ascoltandole</h3>
+          <div class="post-meta">Newsletter #PratoMiMuovo · Aprile 2026 · Per candidati e cittadini</div>
+        </div>
+        <svg class="post-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+      <div class="post-body">
+        <div class="post-content">
+          <p>Caro cittadino, cara candidata, caro candidato,</p>
+          <p>c'è una domanda che molti pratesi si fanno ogni mattina imbottigliati in via Valentini o in viale della Repubblica: <em>"Ma perché nessuno fa qualcosa?"</em></p>
+          <p>La risposta di solito è sempre la stessa: un nuovo svincolo, un sottopasso, una rotatoria in più. Qualche milione di euro, qualche anno di cantieri, qualche promessa elettorale.</p>
+          <p>Noi pensiamo che esista un'altra strada — più intelligente, più economica, più efficace. Si chiama <strong>#PratoMiMuovo</strong>.</p>
+          <hr/>
+          <h2>Il problema è reale. Ma la soluzione non è dove la cerchiamo.</h2>
+          <p>Prato ha un problema di traffico. È un dato di fatto. Ma il traffico non è un problema di spazio — <strong>è un problema di gestione</strong>.</p>
+          <p>Immaginate un ospedale in cui i medici non misurano la pressione sanguigna dei pazienti, non leggono le analisi, non usano monitor. Eppure decidono le cure a occhio. Sembrerebbe assurdo, vero?</p>
+          <p>Eppure è esattamente quello che facciamo con le nostre strade ogni giorno. Le intersezioni di Prato oggi funzionano con semafori a ciclo fisso: verde per 45 secondi, rosso per 30, indipendentemente dal fatto che ci siano tre auto o trecento. Il semaforo non sa niente. Non vede niente. Non reagisce a niente.</p>
+          <p><strong>#PratoMiMuovo cambia questo.</strong></p>
+          <hr/>
+          <h2>Cosa proponiamo: la città come organismo vivo</h2>
+          <p>Un organismo sano ha occhi, un cervello e muscoli. Li usa insieme.</p>
+          <p><strong>Occhi:</strong> sensori installati agli incroci — telecamere intelligenti che contano i veicoli (senza riconoscere nessuno), spire nell'asfalto, dati GPS degli autobus LAM in tempo reale.</p>
+          <p><strong>Cervello:</strong> un software che raccoglie tutti questi dati ogni secondo e prende decisioni: quanto deve durare il verde adesso? Dove si sta formando una coda? Quale bus sta arrivando e merita priorità?</p>
+          <p><strong>Muscoli:</strong> i semafori che cambiano comportamento in base alla realtà — non all'orologio.</p>
+          <p>Il risultato? <strong>Meno code. Meno emissioni. Meno stress.</strong> Bus che arrivano in orario. Pedoni che attraversano in sicurezza. Ciclisti che non vengono tagliati fuori.</p>
+          <hr/>
+          <h2>Perché non basta fare nuove strade</h2>
+          <p>Allargare una strada è come allentare la cintura invece di mettersi a dieta. Funziona per qualche mese, poi il traffico si adatta e il problema ritorna, peggiore di prima. Si chiama <em>induzione della domanda</em>.</p>
+          <p>Costruire un sottopasso costa tra i 5 e i 15 milioni di euro. Richiede anni. Richiede espropri. <strong>#PratoMiMuovo ha un costo di avvio stimato tra i 600.000 e i 2 milioni di euro</strong> — un decimo di un sottopasso — con risultati misurabili in mesi, non anni.</p>
+          <hr/>
+          <h2>A chi si candida ad amministrare Prato</h2>
+          <p>Vi chiediamo solo una cosa: <strong>leggete questo progetto</strong>. Non è una visione astratta. È una proposta tecnica concreta, con architettura definita, protocolli standard europei, stima dei costi e piano di implementazione.</p>
+          <p>Se volete inserirla nel vostro programma elettorale, siamo disponibili a presentarla, spiegarla, discuterla.</p>
+          <p><strong>Il traffico di Prato è un problema risolvibile.</strong> Serve solo la volontà politica di affrontarlo con gli strumenti del presente, non del passato.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST 2 -->
+    <div class="post-item" id="post2">
+      <div class="post-header" onclick="togglePost('post2')">
+        <div>
+          <h3>Ho analizzato 10.000 ordinanze del Comune di Prato. Ecco cosa mi hanno detto sulla mobilità della nostra città.</h3>
+          <div class="post-meta">Post Substack · Progetto #PratoMiMuovo · Analisi open data</div>
+        </div>
+        <svg class="post-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+      <div class="post-body">
+        <div class="post-content">
+          <p>C'è un archivio pubblico, online, accessibile a chiunque, che contiene ogni singola ordinanza di viabilità emessa dal Comune di Prato dal 2004 a oggi.</p>
+          <p>Più di diecimila documenti. Cantieri, divieti di sosta, sensi unici, emergenze strutturali, deroghe per eventi. Un archivio silenzioso che nessuno legge, ma che racconta tutto — chi ha scavato dove, quante volte, per quanto tempo.</p>
+          <p>Io l'ho letto. Con un po' di codice Python e qualche ora di analisi, ho trasformato quell'archivio in qualcosa di utile: una mappa delle criticità di mobilità di Prato, costruita su dati reali invece che su impressioni.</p>
+          <hr/>
+          <h2>Vent'anni di ordinanze in un grafico</h2>
+          <p>Dal 2004 al 2026, il Comune di Prato ha emesso quasi 10.000 ordinanze di viabilità. Il picco è nel 2010 con 698, probabilmente legato a grandi cantieri infrastrutturali. Il crollo nel 2020 è chiaramente il COVID. Dal 2021 la ripresa è costante, e il 2026 è già a 323 ordinanze in soli quattro mesi.</p>
+          <hr/>
+          <h2>La strada più tormentata di Prato</h2>
+          <p><strong>Via Bologna</strong>: 66 ordinanze solo tra il 2021 e il 2026. Presenti ogni anno, senza eccezioni. Di queste, 53 riguardano cantieri e lavori. Significa che Via Bologna è stata interessata da un cantiere, un restringimento, una modifica alla viabilità <em>in media ogni quattro settimane</em> negli ultimi cinque anni.</p>
+          <p>Dietro viene <strong>Via Pistoiese</strong> con 31 ordinanze, e la tendenza qui è preoccupante: 15 di quelle 31 sono concentrate nel solo 2024-2026. Sta accelerando.</p>
+          <hr/>
+          <h2>La mappa dei candidati per PratoMiMuovo</h2>
+          <p>Dall'analisi emergono cinque location prioritarie:</p>
+          <p><strong>Via Bologna e Via Pistoiese</strong> — i due assi con più cantieri continuativi. Semafori adattivi ridurrebbero le code durante i frequenti restringimenti.</p>
+          <p><strong>Via Montalese</strong> — molti interventi di sensi unici e divieti di transito. La geometria della strada cambia spesso: un sistema adattivo ha senso proprio qui.</p>
+          <p><strong>Piazza Stazione</strong> — trend forte nel 2024-2026. Punto naturale per la funzione di <em>bus priority</em>.</p>
+          <p><strong>Via F. Ferrucci</strong> — la proporzione più alta di emergenze strutturali. Utile per testare la priorità ai mezzi di soccorso.</p>
+          <hr/>
+          <h2>I dati aperti funzionano</h2>
+          <p>Tutto questo è possibile perché il Comune di Prato pubblica questi dati. Non ho avuto bisogno di chiedere permessi, presentare domande o aspettare risposte. Ho scritto uno script, ho scaricato i dati, ho fatto l'analisi.</p>
+          <p>PratoMiMuovo vuole fare questo — non portare tecnologia a Prato perché è figa, ma portarla dove serve davvero, dimostrandolo con i numeri.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST 4 -->
+    <div class="post-item" id="post4">
+      <div class="post-header" onclick="togglePost('post4')">
+        <div>
+          <h3>L'aria di Prato: quello che cinque anni di dati non mettono mai insieme</h3>
+          <div class="post-meta">Newsletter #PratoMiMuovo · Aprile 2026 · PM10, ARPAT e qualità dell'aria</div>
+        </div>
+        <svg class="post-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+      <div class="post-body">
+        <div class="post-content">
+          <p>Alle 00:01 del primo gennaio di ogni anno, il PM10 a Prato schizza. Non piano piano — di colpo. In un'ora si possono raggiungere concentrazioni di mille microgrammi per metro cubo: <strong>venti volte il limite legale giornaliero</strong>. È solo uno dei pattern nascosti nei dati ARPAT degli ultimi sei anni — un periodo che include un lockdown globale, l'estate più calda dal 1955, il capodanno cinese della più grande comunità cinese d'Europa e il completo fermo produttivo di uno dei distretti tessili più importanti del continente.</p>
+          <hr/>
+          <h2>Il quadro d'insieme</h2>
+          <p>Prima la buona notizia: Prato non viola il limite di legge. Da sei anni consecutivi, la zona Prato-Pistoia non supera mai i 35 giorni annui con PM10 oltre i 50 µg/m³. Nel 2025, per la prima volta in assoluto in tutta la Toscana, <em>nessuna</em> stazione ha violato quel limite. Con DGR n. 895/2025, i nove comuni della Piana Prato-Pistoia sono stati rimossi ufficialmente dall'elenco delle aree critiche per PM10.</p>
+          <p>La cattiva notizia: la media annuale è rimasta sopra il target OMS (15 µg/m³) per tutti e sei gli anni. Nel 2025 si stima circa 16,5 µg/m³, −14% rispetto al 2024. In direzione giusta, ma non ancora a destinazione.</p>
+          <hr/>
+          <h2>Le correlazioni che nessuno racconta</h2>
+          <p><strong>🎆 Il 1° gennaio è il giorno più inquinato dell'anno.</strong> Non il giorno di maggior traffico. Non il giorno di maggiore produzione. Il primo gennaio. I fuochi d'artificio producono in una notte una massa di particolato equivalente a settimane di normale attività urbana. Nel 2021, con le restrizioni COVID sui raduni, il picco fu significativamente più basso — un esperimento naturale non pianificato che ha confermato il nesso causale.</p>
+          <p><strong>🧧 Il Capodanno Cinese lascia una traccia misurabile.</strong> Prato ospita la comunità cinese più grande d'Europa. Ogni anno tra gennaio e febbraio, il PM10 sale per 24-48 ore in modo localizzato. Questo picco <em>non esiste in nessun'altra città toscana</em>. È un'impronta culturale nell'atmosfera.</p>
+          <p><strong>🏭 Agosto: il distretto si ferma, l'aria respira.</strong> Agosto è sistematicamente il mese con i valori più bassi: 7-9 µg/m³, meno della metà del target OMS. Non è solo il caldo estivo — è anche l'industria tessile ferma. La combinazione dei due fattori rende agosto un mese straordinariamente pulito per una città con produzione intensiva per tutto il resto dell'anno.</p>
+          <p><strong>🦠 Il lockdown 2020: il più grande esperimento involontario.</strong> Riduzione del PM10 superiore al 25% nelle settimane di lockdown più dure. Ma il dato rivelatore è il confronto con NO₂, calato del 40-65%: il traffico produce soprattutto NO₂, mentre il riscaldamento domestico — rimasto acceso — è una fonte di PM10 più rilevante. Fermare le auto non basta a pulire l'aria.</p>
+          <p><strong>🏜️ La polvere del Sahara: quando la colpa non è di nessuno.</strong> Almeno due volte all'anno una massa d'aria nordafricana raggiunge la Toscana. Il PM10 sale a 60-80 µg/m³ senza che a Prato si sia accesa una sola caldaia in più. Questi episodi vengono riportati come "picchi di inquinamento" senza specificare l'origine naturale — ARPAT li identifica dall'analisi chimica del particolato, ma questa informazione raramente arriva ai titoli.</p>
+          <hr/>
+          <h2>Perché tutto questo conta per PratoMiMuovo</h2>
+          <p>Se agosto è il mese più pulito perché le fabbriche stanno ferme, la struttura industriale è una variabile fondamentale. Se il Capodanno produce in una notte un impatto equivalente a settimane di traffico, i divieti dei botti hanno senso anche dal punto di vista della salute pubblica. Se fermare le auto riduce il NO₂ ma non abbastanza il PM10, le politiche di mobilità vanno progettate con questo in mente.</p>
+          <p>Il modulo ambientale di <strong>#PratoMiMuovo</strong> integra i dati ARPAT in tempo reale: quando PM10 o NO₂ superano le soglie nei canyon urbani pratesi, il sistema devia il traffico automaticamente — non ore dopo, ma in tempo reale. I dati esistono. Il problema è che raramente vengono messi insieme nel modo giusto.</p>
+          <p><a href="analisi_pm10_prato.html" target="_blank" style="color: var(--accent2); text-decoration: underline;">→ Apri la dashboard interattiva con tutti i grafici</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST 3 -->
+    <div class="post-item" id="post3">
+      <div class="post-header" onclick="togglePost('post3')">
+        <div>
+          <h3>69 milioni di euro, 3 anni di cantiere, e il traffico resterà uguale</h3>
+          <div class="post-meta">Newsletter #PratoMiMuovo · Aprile 2026 · Il Sottopasso del Soccorso</div>
+        </div>
+        <svg class="post-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+      <div class="post-body">
+        <div class="post-content">
+          <p>Questa settimana voglio parlarvi di una cifra: <strong>69 milioni di euro</strong>.</p>
+          <p>È quello che il Comune di Prato e ANAS spenderanno per costruire il Sottopasso del Soccorso — il tunnel sotto la Declassata tra Via Marx e Via Nenni. Un'opera nata nel 2014, con un preventivo iniziale di 16 milioni, aggiudicata a settembre 2025 per 47,75 milioni, con un costo totale che arriva a 69 milioni. I cantieri partiranno a fine 2026. Dureranno <strong>1.100 giorni consecutivi</strong> — tre anni.</p>
+          <p>E alla fine, il traffico sulla Declassata tornerà uguale a prima. Probabilmente peggio. Vi spiego perché — con i dati alla mano.</p>
+          <hr/>
+          <h2>Il problema n. 1: il cantiere è peggio del problema</h2>
+          <p>La fase più critica prevede la chiusura totale della Declassata per circa <strong>15 mesi consecutivi</strong>. Contemporaneamente verrà chiusa anche Via del Purgatorio. Quei 55.000 veicoli al giorno dovranno trovare un'altra strada, deviati sulle complanari — con <em>una corsia per senso di marcia</em>. Una corsia a flusso libero gestisce 1.600-1.800 veicoli/ora; nelle ore di punta la Declassata ne movimenta 4.000-5.000. Per 15 mesi, Prato avrà un'emergenza viabilistica senza rete di sfogo adeguata. Non è catastrofismo: è aritmetica.</p>
+          <hr/>
+          <h2>Il problema n. 2: i costi sono quadruplicati</h2>
+          <p>Nel 2016 il costo stimato era 16 milioni. Poi: 31 nel 2016, 43 nel 2019, 48 nel 2022, 69 oggi — quadruplicati prima ancora di aver mosso un grammo di terra. Le varianti in corso d'opera, gli imprevisti geologici e i ricorsi al TAR (già avvenuti nel 2024) tendono ad aggiungere un ulteriore 20-30%. Il costo finale potrebbe avvicinarsi agli 80-90 milioni.</p>
+          <hr/>
+          <h2>Il problema n. 3: la domanda indotta</h2>
+          <p>La <strong>legge fondamentale della congestione</strong> (Duranton & Turner, 2011): ogni aumento percentuale di capacità stradale genera un aumento percentuale equivalente di traffico nel medio termine. L'elasticità è prossima a 1. Raddoppi le corsie, raddoppi il traffico entro 5-10 anni. Il caso simbolo è il <em>Katy Freeway di Houston</em>, espanso a 23 corsie per quasi 3 miliardi di dollari e tornato congestionato nel giro di pochi anni. Non è un'eccezione: è la norma.</p>
+          <hr/>
+          <h2>Il problema n. 4: il bottleneck si sposta, non sparisce</h2>
+          <p>Il tunnel risolve 700 metri. Ma gli svincoli, Via Marx, Via Nenni e le intersezioni a monte e a valle restano invariati. Quando apri 4 corsie in mezzo a una rete che non è cambiata, le auto arrivano più veloci ai colli di bottiglia adiacenti. La coda non sparisce: si sposta di 200-300 metri fuori dal tunnel. Si chiama <strong>bottleneck shift</strong> ed è documentato in ogni studio di traffic engineering su interventi analoghi.</p>
+          <hr/>
+          <h2>Il problema n. 5: la falda acquifera</h2>
+          <p>Nei pareri tecnici, <strong>ARPAT ha rilevato che le palizzate laterali dello scavo — a 10 metri di profondità — potrebbero creare un effetto sbarramento sulla falda acquifera</strong>, alterando il deflusso delle acque sotterranee. ARPAT ha contestato che il coefficiente di permeabilità K usato fosse sottostimato. La VIA favorevole del Ministero (agosto 2023) ha superato questa osservazione — ma il rischio tecnico rimane aperto.</p>
+          <hr/>
+          <h2>Come il mondo ha risolto il problema senza scavare tunnel</h2>
+          <p><strong>Seoul (2003):</strong> demolita un'autostrada da 168.000 veicoli/giorno. Risultato: -45% di traffico nell'area in tre anni, +4,3% di utenti della metropolitana. Il traffico "evaporò".</p>
+          <p><strong>Londra (2003):</strong> congestion charge di 5 sterline. Risultato immediato: -33% di traffico, 97 milioni di sterline/anno reinvestiti nel TPL.</p>
+          <p><strong>Groningen (1977):</strong> città di 230.000 abitanti — simile a Prato — divisa in quattro settori percorribili in bici ma non attraversabili in auto. Costo: segnaletica e cordoli. Risultato: -70% di traffico nel centro. Replicato da Barcellona, Ghent, Utrecht, Oslo.</p>
+          <p>La lezione è una sola: <strong>agire sulla domanda è più efficace, più economico e più duraturo che agire sull'offerta.</strong></p>
+          <hr/>
+          <h2>La proposta: #PratoMiMuovo</h2>
+          <p><strong>#PratoMiMuovo</strong> parte da una premessa semplice: il problema non è che le strade sono troppo strette. È che vengono usate male, perché non le ascoltiamo. I semafori aprono e chiudono a ciclo fisso, indipendentemente dal fatto che ci siano tre auto o trecento.</p>
+          <p>Occhi (sensori: telecamere di conteggio, spire, GPS bus LAM), Cervello (IA che ottimizza i cicli ogni 30 secondi), Muscoli (i semafori esistenti riprogrammati per rispondere alla realtà). Bus più veloci e affidabili → più gente li usa → meno auto in giro. Semafori adattivi → -10/20% tempi di percorrenza, -30/40% fermi agli incroci.</p>
+          <p><strong>Costo stimato: 600.000 – 2 milioni di euro</strong> per una prima fase su 20-30 incroci. Un ventesimo del sottopasso. Risultati misurabili in mesi. Nessuna chiusura di strade. Nessun rischio idrogeologico. E il sistema migliora nel tempo — il tunnel no.</p>
+          <hr/>
+          <p>69 milioni di euro, 12 anni di progettazione, 3 anni di cantiere, e alla fine un tunnel che si risatura nel giro di un decennio. Oppure: sensori, software e semafori che finalmente ascoltano la città. A un ventesimo del costo. Operativo in un anno.</p>
+          <p><strong>La scelta è questa. Vale la pena farsela, prima che i cantieri partano.</strong></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CHI SONO -->
+<section id="chisono">
+  <div class="section-label">L'autore</div>
+  <h2>Chi sono</h2>
+  <p class="section-desc">
+    Sono Matteo Tempestini, ingegnere informatico e Program Manager per sistemi ETCS in Alstom (settore ferroviario).
+    #PratoMiMuovo è un progetto civico indipendente nato dalla convinzione che le città possano essere
+    progettate e gestite meglio grazie alla tecnologia — senza aspettare che qualcuno cali soluzioni dall'alto.
+  </p>
+  <div class="social-grid">
+
+    <a class="social-card" href="https://iltempe.substack.com" target="_blank">
+      <div class="social-icon" style="background: rgba(255,108,55,0.15);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff6c37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>
+        </svg>
+      </div>
+      <div class="social-info">
+        <span class="social-name">Substack</span>
+        <span class="social-handle">iltempe.substack.com</span>
+      </div>
+      <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+    </a>
+
+    <a class="social-card" href="https://www.instagram.com/iltempeinsta" target="_blank">
+      <div class="social-icon" style="background: rgba(225,48,108,0.15);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e1306c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><circle cx="17.5" cy="6.5" r="1" fill="#e1306c" stroke="none"/>
+        </svg>
+      </div>
+      <div class="social-info">
+        <span class="social-name">Instagram</span>
+        <span class="social-handle">@iltempeinsta</span>
+      </div>
+      <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+    </a>
+
+    <a class="social-card" href="https://www.facebook.com/iltempe" target="_blank">
+      <div class="social-icon" style="background: rgba(24,119,242,0.15);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1877f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+        </svg>
+      </div>
+      <div class="social-info">
+        <span class="social-name">Facebook</span>
+        <span class="social-handle">facebook.com/iltempe</span>
+      </div>
+      <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+    </a>
+
+    <a class="social-card" href="https://www.linkedin.com/in/matteotempestini/" target="_blank">
+      <div class="social-icon" style="background: rgba(10,102,194,0.15);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a66c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+        </svg>
+      </div>
+      <div class="social-info">
+        <span class="social-name">LinkedIn</span>
+        <span class="social-handle">matteotempestini</span>
+      </div>
+      <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+    </a>
+
+    <a class="social-card" href="https://github.com/iltempe" target="_blank">
+      <div class="social-icon" style="background: rgba(240,246,252,0.08);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c9d1d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+        </svg>
+      </div>
+      <div class="social-info">
+        <span class="social-name">GitHub</span>
+        <span class="social-handle">github.com/iltempe</span>
+      </div>
+      <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+    </a>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    <strong>#PratoMiMuovo</strong> — Mobilità intelligente per una città che funziona<br/>
+    <span style="color: var(--text-faint); margin-top: 0.25rem; display: block;">
+      Progetto indipendente · Prato · 2026 · Matteo Tempestini
+    </span>
+  </p>
+</footer>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<script>
+  // Lightbox
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  // Post accordion
+  function togglePost(id) {
+    const item = document.getElementById(id);
+    item.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
