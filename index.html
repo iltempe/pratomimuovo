@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>#PratoMiMuovo — Archivio del Progetto</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --bg: #0a0b0f;
@@ -287,6 +288,25 @@
     }
     footer strong { color: var(--accent); }
 
+    /* ── ARCH CHARTS ── */
+    .arch-hypothesis-note {
+      background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 10px; padding: 0.85rem 1.25rem;
+      font-size: 0.82rem; color: var(--orange);
+      margin-bottom: 1.5rem; line-height: 1.5;
+    }
+    .arch-charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .arch-chart-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.5rem;
+    }
+    .arch-chart-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .arch-chart-card .sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; }
+
     /* ── SCROLLBAR ── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -316,15 +336,13 @@
       <h1>La città che si muove<br/><span>con intelligenza.</span></h1>
       <p class="hero-subtitle">
         Un progetto di innovazione civica per trasformare la mobilità urbana di Prato —
-        semafori adattivi, sensori IoT, dati aperti, protocolli europei. Senza vendor lock-in.
+        semafori adattivi, sensori IoT, dati aperti.
       </p>
       <div class="hero-pills">
         <span class="pill"><span class="dot"></span> Semafori adattivi</span>
         <span class="pill"><span class="dot"></span> Bus Priority</span>
         <span class="pill"><span class="dot"></span> Pedestrian Extension</span>
         <span class="pill"><span class="dot"></span> Environmental TM</span>
-        <span class="pill"><span class="dot"></span> Open Data</span>
-        <span class="pill"><span class="dot"></span> LoRaWAN · DATEX II · MQTT</span>
       </div>
       <div class="hero-scroll">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -494,29 +512,30 @@
       </div>
     </div>
 
-    <a class="img-card" href="dashboard_ordinanze.html" target="_blank" style="text-decoration:none;color:inherit;">
-      <img src="grafico1_trend_annuale.png" alt="Trend ordinanze annuale" />
-      <div class="img-card-label">
-        <strong>Trend ordinanze 2004–2026 ↗</strong>
-        Grafico interattivo — quasi 10.000 ordinanze anno per anno
-      </div>
-    </a>
+  </div>
 
-    <a class="img-card" href="dashboard_ordinanze.html" target="_blank" style="text-decoration:none;color:inherit;">
-      <img src="grafico2_top_vie.png" alt="Top vie per ordinanze" />
-      <div class="img-card-label">
-        <strong>Top vie per ordinanze ↗</strong>
-        Grafico interattivo — Via Bologna in testa con 66 ordinanze
-      </div>
-    </a>
+  <div class="arch-hypothesis-note" style="margin-top:2rem;">
+    ⚠️ I grafici seguenti rappresentano <strong>ipotesi architetturali del progetto</strong> basate su stime e letteratura di traffic engineering. Non sono dati misurati: possono essere liberamente adattati in base alle esigenze specifiche e ai dati reali di Prato.
+  </div>
+  <div class="arch-charts-grid">
 
-    <a class="img-card" href="dashboard_ordinanze.html" target="_blank" style="text-decoration:none;color:inherit;">
-      <img src="grafico3_heatmap.png" alt="Heatmap vie/anni" />
-      <div class="img-card-label">
-        <strong>Heatmap intensità interventi ↗</strong>
-        Grafico interattivo — ordinanze per via e per anno
-      </div>
-    </a>
+    <div class="arch-chart-card">
+      <h4>Impatto stimato per funzionalità</h4>
+      <p class="sub">Riduzione % stimata rispetto a scenario base senza intervento</p>
+      <canvas id="chartImpatto" height="230"></canvas>
+    </div>
+
+    <div class="arch-chart-card">
+      <h4>Confronto costi — soluzioni di mobilità</h4>
+      <p class="sub">Costo indicativo in milioni di euro (scala logaritmica)</p>
+      <canvas id="chartCosti" height="230"></canvas>
+    </div>
+
+    <div class="arch-chart-card">
+      <h4>Allocazione budget stimata — Fase 1</h4>
+      <p class="sub">Distribuzione ipotetica del budget (~1.3 M€)</p>
+      <canvas id="chartBudget" height="230"></canvas>
+    </div>
 
   </div>
 </section>
@@ -819,6 +838,98 @@
     const item = document.getElementById(id);
     item.classList.toggle('open');
   }
+
+  // ── GRAFICI ARCHITETTURALI (ipotesi) ──────────────────────────────────
+  const darkTick  = '#8892a4';
+  const darkGrid  = 'rgba(255,255,255,0.06)';
+  const baseOpts  = { responsive: true, plugins: { legend: { display: false } } };
+
+  // 1 — Impatto stimato per funzionalità (bar orizzontale)
+  new Chart(document.getElementById('chartImpatto'), {
+    type: 'bar',
+    data: {
+      labels: ['Semafori adattivi', 'Bus Priority', 'Ped. Extension', 'Environmental TM', 'Verde bici'],
+      datasets: [{
+        data: [20, 35, 25, 15, 30],
+        backgroundColor: [
+          'rgba(99,102,241,0.75)','rgba(6,182,212,0.75)',
+          'rgba(16,185,129,0.75)','rgba(168,85,247,0.75)','rgba(245,158,11,0.75)'
+        ],
+        borderColor: ['#6366f1','#06b6d4','#10b981','#a855f7','#f59e0b'],
+        borderWidth: 1, borderRadius: 5,
+      }]
+    },
+    options: {
+      ...baseOpts,
+      indexAxis: 'y',
+      scales: {
+        x: { beginAtZero: true, max: 42,
+          ticks: { color: darkTick, callback: v => '-'+v+'%' },
+          grid: { color: darkGrid } },
+        y: { ticks: { color: darkTick, font: { size: 11 } }, grid: { color: darkGrid } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' riduzione stimata: -'+ctx.parsed.x+'%' } }
+      }
+    }
+  });
+
+  // 2 — Confronto costi soluzioni di mobilità (bar verticale, log)
+  new Chart(document.getElementById('chartCosti'), {
+    type: 'bar',
+    data: {
+      labels: ['PratoMiMuovo\nFase 1', 'Rotatoria\nmedia', 'Sottopasso\nSoccorso'],
+      datasets: [{
+        data: [1.3, 1.5, 69],
+        backgroundColor: [
+          'rgba(16,185,129,0.75)','rgba(245,158,11,0.75)','rgba(239,68,68,0.75)'
+        ],
+        borderColor: ['#10b981','#f59e0b','#ef4444'],
+        borderWidth: 1, borderRadius: 5,
+      }]
+    },
+    options: {
+      ...baseOpts,
+      scales: {
+        y: { type: 'logarithmic',
+          ticks: { color: darkTick, callback: v => v+'M€' },
+          grid: { color: darkGrid } },
+        x: { ticks: { color: darkTick, font: { size: 11 } }, grid: { color: darkGrid } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' costo stimato: '+ctx.parsed.y+' M€' } }
+      }
+    }
+  });
+
+  // 3 — Allocazione budget Fase 1 (doughnut)
+  new Chart(document.getElementById('chartBudget'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Sensori IoT', 'Software / IA', 'Integraz. semafori', 'Test & formazione', 'Contingency'],
+      datasets: [{
+        data: [35, 25, 25, 10, 5],
+        backgroundColor: [
+          'rgba(99,102,241,0.8)','rgba(6,182,212,0.8)',
+          'rgba(16,185,129,0.8)','rgba(245,158,11,0.8)','rgba(168,85,247,0.8)'
+        ],
+        borderColor: ['#6366f1','#06b6d4','#10b981','#f59e0b','#a855f7'],
+        borderWidth: 2, hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true, position: 'bottom',
+          labels: { color: darkTick, font: { size: 11 }, padding: 10 }
+        },
+        tooltip: { callbacks: { label: ctx => ' '+ctx.label+': '+ctx.parsed+'%' } }
+      }
+    }
+  });
 </script>
 
 </body>
