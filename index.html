@@ -1249,7 +1249,7 @@
   const baseOpts  = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
   // 1 — Impatto stimato per funzionalità (bar orizzontale)
-  new Chart(document.getElementById('chartImpatto'), {
+  const _cImpatto = new Chart(document.getElementById('chartImpatto'), {
     type: 'bar',
     data: {
       labels: ['Semafori adattivi', 'Bus Priority', 'Ped. Extension', 'Environmental TM', 'Verde bici'],
@@ -1280,7 +1280,7 @@
   });
 
   // 2 — Confronto costi soluzioni di mobilità (bar verticale, log)
-  new Chart(document.getElementById('chartCosti'), {
+  const _cCosti = new Chart(document.getElementById('chartCosti'), {
     type: 'bar',
     data: {
       labels: ['PratoMiMuovo\nFase 1', 'Rotatoria\nmedia', 'Sottopasso\nSoccorso'],
@@ -1309,7 +1309,7 @@
   });
 
   // 3 — Allocazione budget Fase 1 (doughnut)
-  new Chart(document.getElementById('chartBudget'), {
+  const _cBudget = new Chart(document.getElementById('chartBudget'), {
     type: 'doughnut',
     data: {
       labels: ['Sensori IoT', 'Software / IA', 'Integraz. semafori', 'Test & formazione', 'Contingency'],
@@ -1334,6 +1334,11 @@
         tooltip: { callbacks: { label: ctx => ' '+ctx.label+': '+ctx.parsed+'%' } }
       }
     }
+  });
+
+  // Chart resize fix — re-fit all charts when window size changes
+  window.addEventListener('resize', () => {
+    _cImpatto.resize(); _cCosti.resize(); _cBudget.resize();
   });
 
   // ── TRAFFIC SIMULATION ──────────────────────────────────────────────────
@@ -1365,12 +1370,15 @@
     const FIXED_GREEN = 62, FIXED_RED = 160;
     // Adaptive: hold green while queued, blink-length red
     const ADAP_RED = 20;
-    const SPAWN_INT = 52;       // frames between car spawns (same both modes)
-    const BASE_SPEED = 1.1;    // px/frame — slow enough to see queuing
+    const SPAWN_INT  = 52;   // frames between car spawns within a batch
+    const BASE_SPEED = 1.1;  // px/frame — slow enough to see queuing
+    const BATCH_SIZE = 15;   // cars per wave
+    const BATCH_PAUSE = 320; // frames of quiet between waves (~5 s @ 60 fps)
 
     let adaptive = false;
     let cars = [], passed = 0, totalWait = 0, waitCount = 0;
     let frame = 0, green = true, timer = 0;
+    let spawnTimer = 0, batchCount = 0, batchPausing = false, batchPauseTimer = 0;
     const COLORS = ['#60a5fa','#34d399','#fbbf24','#a78bfa','#f472b6','#38bdf8','#fb923c'];
 
     // ── State helpers ────────────────────────────────────────────────────
@@ -1386,10 +1394,20 @@
       if (timer >= dur) {
         if (!(adaptive && green && queued() > 0)) { green = !green; timer = 0; }
       }
-      if (frame % SPAWN_INT === 0) {
-        const idx = Math.floor(frame / SPAWN_INT) % COLORS.length;
-        cars.push({ x: -CW - Math.random()*10, speed: BASE_SPEED * (0.85 + Math.random()*0.3),
-                    color: COLORS[idx], waitStart: 0, stopped: false, done: false });
+      // ── Batch spawn ──────────────────────────────────────────────────────
+      if (!batchPausing) {
+        spawnTimer++;
+        if (spawnTimer >= SPAWN_INT) {
+          spawnTimer = 0;
+          const idx = batchCount % COLORS.length;
+          cars.push({ x: -CW - Math.random()*10, speed: BASE_SPEED * (0.85 + Math.random()*0.3),
+                      color: COLORS[idx], waitStart: 0, stopped: false, done: false });
+          batchCount++;
+          if (batchCount >= BATCH_SIZE) { batchPausing = true; batchPauseTimer = 0; }
+        }
+      } else {
+        batchPauseTimer++;
+        if (batchPauseTimer >= BATCH_PAUSE) { batchPausing = false; batchCount = 0; spawnTimer = 0; }
       }
 
       cars.sort((a, b) => a.x - b.x); // back-to-front order
@@ -1619,6 +1637,7 @@
       adaptive = on;
       cars = []; passed = 0; totalWait = 0; waitCount = 0;
       frame = 0; timer = 0; green = true;
+      spawnTimer = 0; batchCount = 0; batchPausing = false; batchPauseTimer = 0;
     };
 
     loop();
