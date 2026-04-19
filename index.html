@@ -386,6 +386,14 @@
     .arch-chart-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
     .arch-chart-card .sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; }
     .chart-box { position: relative; height: 210px; width: 100%; }
+    /* ── DATI LINK CARDS (3 per row) ── */
+    .cards-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 700px) { .cards-3 { grid-template-columns: 1fr; } }
 
     /* ── TRAFFIC SIMULATION ── */
     .traffic-sim-section {
@@ -736,9 +744,8 @@
   <h2>Dati</h2>
   <p class="section-desc">Dati utili al progetto — analisi interattive, dashboard e visualizzazioni prodotte durante la ricerca.</p>
   
-  <div class="dati-grid">
+  <div class="arch-charts-grid">
 
-    <!-- riga 1: grafici di analisi -->
     <div class="arch-chart-card">
       <h4>Impatto stimato per funzionalità</h4>
       <p class="sub">Riduzione % stimata rispetto a scenario base senza intervento</p>
@@ -757,36 +764,29 @@
       <div class="chart-box"><canvas id="chartBudget"></canvas></div>
     </div>
 
-    <!-- riga 2: dashboard e monitoraggi -->
+  </div>
+
+  <div class="cards-3">
+
     <a class="card" href="dashboard_ordinanze.html" target="_blank">
       <div class="card-icon cyan">📊</div>
-      <div>
-        <h3>Dashboard Ordinanze</h3>
-        <span class="card-badge badge-html">HTML</span>
-      </div>
+      <div><h3>Dashboard Ordinanze</h3><span class="card-badge badge-html">HTML</span></div>
       <p>Visualizzazione interattiva di 10.000+ ordinanze di viabilità del Comune di Prato (2004-2026). Trend, top vie, heatmap.</p>
     </a>
 
     <a class="card" href="https://iltempe.github.io/pratomimuovo-traffico/" target="_blank">
       <div class="card-icon green">🚦</div>
-      <div>
-        <h3>Monitoraggio Soccorso</h3>
-        <span class="card-badge badge-html">Web</span>
-      </div>
+      <div><h3>Monitoraggio Soccorso</h3><span class="card-badge badge-html">Web</span></div>
       <p>Monitoraggio della velocità dei veicoli al Sottopasso del Soccorso — dati aggiornati in tempo reale sull'asse Declassata di Prato.</p>
     </a>
 
     <a class="card" href="https://iltempe.github.io/pratomimuovo_incidenti/" target="_blank">
       <div class="card-icon violet">🚨</div>
-      <div>
-        <h3>Dati Incidenti Prato</h3>
-        <span class="card-badge badge-html">Web</span>
-      </div>
+      <div><h3>Dati Incidenti Prato</h3><span class="card-badge badge-html">Web</span></div>
       <p>Analisi e visualizzazione degli incidenti stradali nel territorio pratese — dati georeferenziati.</p>
     </a>
 
-  </div>
-</section>
+  </div>/section>
 
 <!-- COMUNICAZIONE -->
 <section id="comunicazione">
