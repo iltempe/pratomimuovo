@@ -166,8 +166,7 @@
     }
 
     /* ── CARDS GRID ── */
-    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; }
-    @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
     @media (max-width: 480px) { .cards { grid-template-columns: 1fr; } }
     .card {
       background: var(--card); border: 1px solid var(--border);
@@ -726,6 +725,7 @@
       <canvas id="chartBudget" height="230"></canvas>
     </div>
 
+  </div><!-- /arch-charts-grid -->
 
   <div class="cards">
 
@@ -1314,186 +1314,178 @@
     }
   });
 
-  // ── TRAFFIC SIMULATION ──────────────────────────────────────────────────
+  // ── TRAFFIC SIMULATION (simplified) ────────────────────────────────────
   (function() {
     const canvas = document.getElementById('trafficCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const W = 800, H = 260;
+    const W = 720, H = 180;
     canvas.width = W; canvas.height = H;
 
-    const ROAD_Y = H / 2, ROAD_H = 56;
-    const LIGHT_X = W * 0.52;
-    const CAR_W = 30, CAR_H = 16, STOP_GAP = 5;
-    const BASE_SPEED = 3.0;
-    const SPAWN_INTERVAL = 34;
+    // Road geometry
+    const RY = H / 2;       // road centre Y
+    const RH = 48;           // road height
+    const LX = W * 0.5;     // traffic light X
+    const CW = 32, CH = 14; // car width, height
+    const GAP = 6;           // min gap between cars
 
-    // FIXED: rigid cycle → long queues build up
-    const FIXED_GREEN = 75, FIXED_RED = 140;
-    // ADAPTIVE: holds green while cars are waiting, very short red
-    const ADAP_RED = 28;
+    // Timing (frames @ ~60fps)
+    let adaptive = false;
+    const FIXED_GREEN = 80, FIXED_RED = 130;
+    const ADAP_RED    = 22;   // very short red in adaptive mode
 
-    let adaptive = false, cars = [], passed = 0, waitTimes = [];
-    let frame = 0, greenPhase = true, phaseTimer = 0;
-    const CAR_COLORS = ['#60a5fa','#34d399','#fbbf24','#a78bfa','#f472b6','#38bdf8','#4ade80'];
+    let cars = [], passed = 0, totalWait = 0, waitCount = 0;
+    let frame = 0, green = true, timer = 0;
+    const COLORS = ['#60a5fa','#34d399','#fbbf24','#a78bfa','#f472b6'];
 
-    function queueCount() {
-      return cars.filter(c => !c.passed && c.stopped && c.x < LIGHT_X).length;
+    function queued() {
+      return cars.filter(c => !c.done && c.stopped).length;
     }
-
-    function getGreenDuration() {
+    function greenDur() {
       if (!adaptive) return FIXED_GREEN;
-      // Adaptive: keep green as long as cars are queued
-      return queueCount() > 0 ? 9999 : 40;
+      return queued() > 0 ? 9999 : 45; // hold green while cars wait
     }
-    function getRedDuration() { return adaptive ? ADAP_RED : FIXED_RED; }
+    function redDur() { return adaptive ? ADAP_RED : FIXED_RED; }
 
-    function spawnCar() {
-      cars.push({
-        x: -CAR_W - Math.random() * 20,
-        speed: BASE_SPEED * (0.82 + Math.random() * 0.36),
-        color: CAR_COLORS[Math.floor(Math.random() * CAR_COLORS.length)],
-        waitStart: null, passed: false, stopped: false,
-      });
-    }
-
-    function update() {
+    function tick() {
       frame++;
-      phaseTimer++;
-
-      // Phase switching
-      const dur = greenPhase ? getGreenDuration() : getRedDuration();
-      if (phaseTimer >= dur) {
-        // Adaptive: only switch to red when queue is gone
-        const ok = adaptive && greenPhase ? queueCount() === 0 : true;
-        if (ok) { greenPhase = !greenPhase; phaseTimer = 0; }
+      timer++;
+      const dur = green ? greenDur() : redDur();
+      if (timer >= dur) {
+        if (adaptive && green && queued() > 0) { /* hold */ }
+        else { green = !green; timer = 0; }
+      }
+      // Spawn one car every ~36 frames
+      if (frame % 36 === 0) {
+        cars.push({ x: -CW, speed: 2.8 + Math.random()*1.2,
+          color: COLORS[frame/36%COLORS.length|0],
+          waitStart: 0, stopped: false, done: false });
       }
 
-      if (frame % SPAWN_INTERVAL === 0) spawnCar();
+      // Move cars (process back-to-front to avoid collisions)
+      // Sort ascending x = back-to-front
+      cars.sort((a,b) => a.x - b.x);
 
-      // Sort front-to-back so we can find the car ahead easily
-      cars.sort((a, b) => b.x - a.x);
+      for (let i = 0; i < cars.length; i++) {
+        const c = cars[i];
+        if (c.done) continue;
 
-      cars.forEach((c, i) => {
-        if (c.passed) return;
-
-        // Gap to car directly ahead
+        // Gap to car ahead (next car with higher x)
         let frontX = W + 9999;
-        for (let j = 0; j < i; j++) {
-          if (!cars[j].passed) { frontX = cars[j].x; break; }
+        for (let j = i + 1; j < cars.length; j++) {
+          if (!cars[j].done) { frontX = cars[j].x; break; }
         }
-        const gap = frontX - c.x - CAR_W;
+        const freeGap = frontX - c.x - CW;
 
         // Must stop at red?
-        const distToLight = LIGHT_X - c.x - CAR_W;
-        const mustStop = !greenPhase && distToLight > 0 && distToLight <= c.speed + STOP_GAP + 2;
+        const distLight = LX - c.x - CW;
+        const mustStop  = !green && distLight > 0 && distLight <= c.speed + GAP + 1;
 
-        if (mustStop && gap > 0) {
-          c.x = Math.min(c.x + c.speed, LIGHT_X - CAR_W - STOP_GAP);
-          c.stopped = true;
-          if (!c.waitStart) c.waitStart = frame;
-        } else if (gap > STOP_GAP) {
-          const move = Math.min(c.speed, gap - STOP_GAP);
-          if (move > 0) {
-            c.x += move;
-            if (c.waitStart && c.x >= LIGHT_X) {
-              waitTimes.push(frame - c.waitStart);
-              c.waitStart = null;
-            }
+        if (mustStop && freeGap > 0) {
+          c.x = Math.min(c.x + c.speed, LX - CW - GAP);
+          if (!c.stopped) { c.stopped = true; c.waitStart = frame; }
+        } else if (freeGap > GAP) {
+          c.x += Math.min(c.speed, freeGap - GAP);
+          if (c.stopped && c.x >= LX) {
+            totalWait += frame - c.waitStart;
+            waitCount++;
             c.stopped = false;
           }
         }
+        if (c.x > W + CW) c.done = true;
+      }
 
-        if (c.x > W + CAR_W * 2) { c.passed = true; passed++; }
-      });
-
-      if (cars.length > 100) cars = cars.filter(c => !c.passed);
+      if (cars.length > 80) cars = cars.filter(c => !c.done);
     }
 
-    function draw() {
+    function render() {
       ctx.clearRect(0, 0, W, H);
 
-      // Road
+      // Road background
       ctx.fillStyle = '#1a2030';
-      ctx.fillRect(0, ROAD_Y - ROAD_H/2, W, ROAD_H);
-      ctx.strokeStyle = 'rgba(255,255,255,0.14)'; ctx.lineWidth = 1.5;
-      ctx.setLineDash([20,14]);
-      ctx.beginPath(); ctx.moveTo(0, ROAD_Y); ctx.lineTo(W, ROAD_Y); ctx.stroke();
+      ctx.fillRect(0, RY - RH/2, W, RH);
+
+      // Dashed centre line
+      ctx.strokeStyle = 'rgba(255,255,255,0.13)';
+      ctx.lineWidth = 1.5; ctx.setLineDash([18,12]);
+      ctx.beginPath(); ctx.moveTo(0, RY); ctx.lineTo(W, RY); ctx.stroke();
       ctx.setLineDash([]);
-      ctx.strokeStyle = 'rgba(255,255,255,0.28)'; ctx.lineWidth = 2;
-      [ROAD_Y - ROAD_H/2, ROAD_Y + ROAD_H/2].forEach(y => {
+
+      // Road edges
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2;
+      [RY-RH/2, RY+RH/2].forEach(y=>{
         ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
       });
 
-      // Traffic light
-      const poleTop = ROAD_Y - ROAD_H/2 - 2;
+      // ── Traffic light ──
       ctx.fillStyle = '#555';
-      ctx.fillRect(LIGHT_X - 2, poleTop - 48, 4, 48);
-      const bx = LIGHT_X - 13, by = poleTop - 72;
+      ctx.fillRect(LX - 2, RY - RH/2 - 44, 4, 44);
+
+      const bx = LX-11, by = RY-RH/2-62;
       ctx.fillStyle = '#1c1c1c';
-      ctx.beginPath(); ctx.roundRect(bx, by, 26, 54, 5); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(bx, by, 22, 46, 4); ctx.fill();
 
-      ctx.fillStyle = greenPhase ? '#2a0808' : '#ef4444';
-      ctx.beginPath(); ctx.arc(LIGHT_X, by+14, 9, 0, Math.PI*2); ctx.fill();
-      if (!greenPhase) {
-        ctx.fillStyle='rgba(239,68,68,0.25)';
-        ctx.beginPath(); ctx.arc(LIGHT_X,by+14,15,0,Math.PI*2); ctx.fill();
-      }
-      ctx.fillStyle = greenPhase ? '#22c55e' : '#0f2a14';
-      ctx.beginPath(); ctx.arc(LIGHT_X, by+40, 9, 0, Math.PI*2); ctx.fill();
-      if (greenPhase) {
-        ctx.fillStyle='rgba(34,197,94,0.25)';
-        ctx.beginPath(); ctx.arc(LIGHT_X,by+40,15,0,Math.PI*2); ctx.fill();
+      // Red dot
+      ctx.fillStyle = green ? '#2a0a0a' : '#ef4444';
+      ctx.beginPath(); ctx.arc(LX, by+12, 7, 0, Math.PI*2); ctx.fill();
+      // Green dot
+      ctx.fillStyle = green ? '#22c55e' : '#0a200f';
+      ctx.beginPath(); ctx.arc(LX, by+34, 7, 0, Math.PI*2); ctx.fill();
+      // Glow
+      if (green) {
+        ctx.fillStyle='rgba(34,197,94,0.2)';
+        ctx.beginPath(); ctx.arc(LX,by+34,13,0,Math.PI*2); ctx.fill();
+      } else {
+        ctx.fillStyle='rgba(239,68,68,0.2)';
+        ctx.beginPath(); ctx.arc(LX,by+12,13,0,Math.PI*2); ctx.fill();
       }
 
-      // Cars (two lane rows)
-      let di = 0;
+      // ── Cars ──
       cars.forEach(c => {
-        if (c.passed) return;
-        const lane = di % 2;
-        const cy = ROAD_Y - ROAD_H/4 + lane*(ROAD_H/2) - CAR_H/2;
-        di++;
+        if (c.done) return;
+        const cy = RY - CH/2;
         ctx.fillStyle = c.color;
-        ctx.beginPath(); ctx.roundRect(c.x, cy+2, CAR_W, CAR_H-4, 4); ctx.fill();
-        ctx.fillStyle='rgba(200,230,255,0.28)';
-        ctx.fillRect(c.x+CAR_W*0.55, cy+4, CAR_W*0.22, CAR_H-10);
-        ctx.fillStyle='#fef9c3';
-        ctx.fillRect(c.x+CAR_W-3, cy+4, 3, 3);
-        ctx.fillRect(c.x+CAR_W-3, cy+CAR_H-9, 3, 3);
+        ctx.beginPath(); ctx.roundRect(c.x, cy, CW, CH, 3); ctx.fill();
+        // Windshield
+        ctx.fillStyle = 'rgba(180,220,255,0.3)';
+        ctx.fillRect(c.x + CW*0.55, cy+2, CW*0.2, CH-4);
+        // Brake lights
         if (c.stopped) {
-          ctx.fillStyle='rgba(239,68,68,0.9)';
-          ctx.fillRect(c.x, cy+4, 3, 3);
-          ctx.fillRect(c.x, cy+CAR_H-9, 3, 3);
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(c.x, cy+2, 3, 4);
+          ctx.fillRect(c.x, cy+CH-6, 3, 4);
         }
       });
 
-      // Mode badge
-      ctx.fillStyle = adaptive ? '#4ade80' : '#f87171';
+      // ── Mode label ──
       ctx.font = 'bold 12px system-ui,sans-serif';
-      ctx.fillText(adaptive ? '🟢 ADATTIVO — le auto scorrono liberamente' : '🔴 CICLO FISSO — coda in formazione', 14, 20);
+      ctx.fillStyle = adaptive ? '#4ade80' : '#f87171';
+      ctx.fillText(adaptive
+        ? '🟢 ADATTIVO: verde finché ci sono auto — scorrimento libero'
+        : '🔴 CICLO FISSO: rosso indipendente dalla coda', 10, 18);
 
-      // Queue indicator
-      const q = queueCount();
+      // Queue label
+      const q = queued();
       if (q > 0) {
-        ctx.fillStyle='rgba(239,68,68,0.9)';
-        ctx.font='bold 11px system-ui,sans-serif';
-        ctx.fillText('coda: '+q+' auto', LIGHT_X-95, ROAD_Y-ROAD_H/2-4);
+        ctx.fillStyle = 'rgba(239,68,68,0.9)';
+        ctx.font = 'bold 11px system-ui,sans-serif';
+        ctx.fillText('↑ coda: '+q, LX-60, RY-RH/2-2);
       }
 
+      // Stats
       document.getElementById('statQueue').textContent  = q;
-      document.getElementById('statPassed').textContent = passed;
-      const last = waitTimes.slice(-20);
-      const avg  = last.length ? Math.round(last.reduce((a,b)=>a+b,0)/last.length/60) : 0;
-      document.getElementById('statWait').textContent   = avg+'s';
+      document.getElementById('statPassed').textContent = passed + cars.filter(c=>c.done).length;
+      const avg = waitCount ? Math.round(totalWait/waitCount/60) : 0;
+      document.getElementById('statWait').textContent   = avg + 's';
     }
 
-    function loop() { update(); draw(); requestAnimationFrame(loop); }
+    function loop() { tick(); render(); requestAnimationFrame(loop); }
 
     window.simSetAdaptive = function(on) {
       adaptive = on;
-      cars = []; passed = 0; waitTimes = [];
-      frame = 0; phaseTimer = 0; greenPhase = true;
+      cars = []; passed = 0; totalWait = 0; waitCount = 0;
+      frame = 0; timer = 0; green = true;
     };
 
     loop();
