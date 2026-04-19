@@ -395,6 +395,29 @@
       margin-top: 1.5rem;
     }
     @media (max-width: 700px) { .cards-3 { grid-template-columns: 1fr; } }
+    /* ── VIDEO GRID ── */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+    }
+    .video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    @media (max-width: 700px) { .video-grid { grid-template-columns: 1fr; } }
 
     /* ── TRAFFIC SIMULATION ── */
     .traffic-sim-section {
@@ -558,6 +581,7 @@
     <li><a href="#documenti">Documenti</a></li>
     <li><a href="#dati">Dati</a></li>
     <li><a href="#comunicazione">Comunicazione</a></li>
+    <li><a href="#video">Video</a></li>
     <li><a href="#chisono">Chi sono</a></li>
     <li><a href="#ambasciatore" style="color:var(--accent2);">Condividi</a></li>
   </ul>
@@ -962,6 +986,29 @@
       </div>
     </div>
 
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section id="video">
+  <div class="section-label">Media</div>
+  <h2>Video</h2>
+  <p class="section-desc">Approfondimenti video sul traffico urbano intelligente e sul progetto #PratoMiMuovo.</p>
+  <div class="video-grid">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/qwkEQLL3m_I"
+              title="Video 1 — PratoMiMuovo"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen></iframe>
+    </div>
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/ni3teWmnOR0"
+              title="Video 2 — PratoMiMuovo"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen></iframe>
+    </div>
   </div>
 </section>
 
