@@ -786,7 +786,8 @@
       <p>Analisi e visualizzazione degli incidenti stradali nel territorio pratese — dati georeferenziati.</p>
     </a>
 
-  </div>/section>
+  </div>
+</section>
 
 <!-- COMUNICAZIONE -->
 <section id="comunicazione">
@@ -1364,8 +1365,8 @@
     const FIXED_GREEN = 62, FIXED_RED = 160;
     // Adaptive: hold green while queued, blink-length red
     const ADAP_RED = 20;
-    const SPAWN_INT = 40;       // frames between car spawns (same both modes)
-    const BASE_SPEED = 1.75;   // px/frame — slow enough to see queuing
+    const SPAWN_INT = 52;       // frames between car spawns (same both modes)
+    const BASE_SPEED = 1.1;    // px/frame — slow enough to see queuing
 
     let adaptive = false;
     let cars = [], passed = 0, totalWait = 0, waitCount = 0;
