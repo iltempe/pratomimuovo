@@ -1336,10 +1336,12 @@
     }
   });
 
-  // Chart resize fix — re-fit all charts when window size changes
-  window.addEventListener('resize', () => {
+  // Chart resize fix — ResizeObserver fires AFTER grid reflow (window.resize fires before)
+  const _roChart = new ResizeObserver(() => {
     _cImpatto.resize(); _cCosti.resize(); _cBudget.resize();
   });
+  const _chartsGrid = document.querySelector('.arch-charts-grid');
+  if (_chartsGrid) _roChart.observe(_chartsGrid);
 
   // ── TRAFFIC SIMULATION ──────────────────────────────────────────────────
   (function() {
@@ -1382,9 +1384,11 @@
     const COLORS = ['#60a5fa','#34d399','#fbbf24','#a78bfa','#f472b6','#38bdf8','#fb923c'];
 
     // ── State helpers ────────────────────────────────────────────────────
-    function queued() { return cars.filter(c => !c.done && c.stopped).length; }
-    function greenDur() { return adaptive ? (queued() > 0 ? 9999 : 40) : FIXED_GREEN; }
-    function redDur()   { return adaptive ? ADAP_RED : FIXED_RED; }
+    function queued()    { return cars.filter(c => !c.done && c.stopped).length; }
+    function anyCar()    { return cars.some(c => !c.done); }
+    // Adaptive: stay green while ANY car is on screen; only cycle during batch pause
+    function greenDur()  { return adaptive ? (anyCar() ? 9999 : 40) : FIXED_GREEN; }
+    function redDur()    { return adaptive ? ADAP_RED : FIXED_RED; }
 
     // ── Tick ─────────────────────────────────────────────────────────────
     function tick() {
@@ -1392,7 +1396,7 @@
       timer++;
       const dur = green ? greenDur() : redDur();
       if (timer >= dur) {
-        if (!(adaptive && green && queued() > 0)) { green = !green; timer = 0; }
+        if (!(adaptive && green && anyCar())) { green = !green; timer = 0; }
       }
       // ── Batch spawn ──────────────────────────────────────────────────────
       if (!batchPausing) {
