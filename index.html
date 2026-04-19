@@ -166,7 +166,9 @@
     }
 
     /* ── CARDS GRID ── */
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; }
+    @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .cards { grid-template-columns: 1fr; } }
     .card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: 12px; padding: 1.5rem;
@@ -361,15 +363,66 @@
     }
     .arch-charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
     }
+    @media (max-width: 768px) { .arch-charts-grid { grid-template-columns: 1fr; } }
     .arch-chart-card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: 12px; padding: 1.25rem 1.5rem;
     }
     .arch-chart-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
     .arch-chart-card .sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+    /* ── TRAFFIC SIMULATION ── */
+    .traffic-sim-section {
+      margin-top: 2.5rem;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem 1.75rem;
+    }
+    .traffic-sim-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .traffic-sim-desc  { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+
+    .sim-toggle-row {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .sim-lbl-fixed    { font-size: 0.9rem; font-weight: 600; color: #ef4444; }
+    .sim-lbl-adaptive { font-size: 0.9rem; font-weight: 600; color: #22c55e; }
+
+    /* Toggle switch */
+    .sim-toggle-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
+    .sim-toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .sim-slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #374151; border-radius: 28px; transition: background .3s;
+    }
+    .sim-slider::before {
+      content: ''; position: absolute;
+      height: 20px; width: 20px; left: 4px; bottom: 4px;
+      background: #fff; border-radius: 50%; transition: transform .3s;
+    }
+    .sim-toggle-switch input:checked + .sim-slider { background: #22c55e; }
+    .sim-toggle-switch input:checked + .sim-slider::before { transform: translateX(24px); }
+
+    .sim-canvas-wrap {
+      width: 100%; border-radius: 10px; overflow: hidden;
+      background: #0d111a; border: 1px solid var(--border);
+    }
+    .sim-canvas-wrap canvas { display: block; width: 100%; height: auto; }
+
+    .sim-stats-row {
+      display: flex; gap: 1.5rem; margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .sim-stat {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.75rem 1.25rem;
+      display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+      min-width: 110px;
+    }
+    .sim-stat-val { font-size: 1.6rem; font-weight: 800; color: var(--accent); line-height: 1; }
+    .sim-stat-lbl { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
 
     /* ── LOGO NAV ── */
     .nav-logo { height: 30px; vertical-align: middle; margin-right: 0.5rem; }
@@ -423,6 +476,33 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      section { padding: 3rem 1.25rem; }
+      h2 { font-size: 1.6rem; }
+      .hero-subtitle { font-size: 1rem; }
+      .hero-pills { gap: 0.5rem; }
+      .pill { font-size: 0.78rem; padding: 0.35rem 0.7rem; }
+      .features-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+      .flow-wrap { grid-template-columns: 1fr !important; }
+      .traffic-sim-section { padding: 1.25rem 1rem; }
+      .sim-stats-row { gap: 0.75rem; }
+      .sim-stat { min-width: 80px; padding: 0.6rem 0.75rem; }
+      .sim-stat-val { font-size: 1.2rem; }
+      .social-grid { grid-template-columns: 1fr; }
+      .share-btn { font-size: 0.82rem; padding: 0.7rem 1rem; }
+      .arch-chart-card { padding: 1rem; }
+      .doc-grid { grid-template-columns: 1fr !important; }
+    }
+    @media (max-width: 480px) {
+      .hero-cta { flex-direction: column; align-items: flex-start; }
+      .ambassador-logo { width: 110px; }
+      .sim-toggle-row { flex-wrap: wrap; gap: 0.5rem; }
+      h1 { font-size: clamp(1.9rem, 8vw, 3.5rem); }
+    }
   </style>
 </head>
 <body>
@@ -555,28 +635,39 @@
     </div>
   </div>
 
-  <div class="arch-hypothesis-note" style="margin-top:2rem;">
-    ℹ️ I dati qui riportati sono <strong>proiezioni basate su stime</strong> da validare a valle di sperimentazioni reali sul territorio. I costi del progetto sono stimati sulla base dell'architettura di sistema proposta: possono variare in base alle soluzioni tecniche scelte, ma rimangono di gran lunga più bassi dei costi di qualunque grande opera infrastrutturale.
+  <!-- ── SIMULAZIONE TRAFFICO ON/OFF ─────────────────────────── -->
+  <div class="traffic-sim-section">
+    <h3 class="traffic-sim-title">Regolazione dinamica vs ciclo fisso</h3>
+    <p class="traffic-sim-desc">Attiva la <strong>regolazione adattiva</strong> e osserva come cambiano le code all'incrocio rispetto a un semaforo a ciclo fisso.</p>
+
+    <div class="sim-toggle-row">
+      <span class="sim-lbl-fixed">🔴 Ciclo fisso</span>
+      <label class="sim-toggle-switch">
+        <input type="checkbox" id="simToggle" onchange="simSetAdaptive(this.checked)">
+        <span class="sim-slider"></span>
+      </label>
+      <span class="sim-lbl-adaptive">🟢 Adattivo</span>
+    </div>
+
+    <div class="sim-canvas-wrap">
+      <canvas id="trafficCanvas"></canvas>
+    </div>
+
+    <div class="sim-stats-row">
+      <div class="sim-stat">
+        <span class="sim-stat-val" id="statQueue">0</span>
+        <span class="sim-stat-lbl">Auto in coda</span>
+      </div>
+      <div class="sim-stat">
+        <span class="sim-stat-val" id="statPassed">0</span>
+        <span class="sim-stat-lbl">Auto transitate</span>
+      </div>
+      <div class="sim-stat">
+        <span class="sim-stat-val" id="statWait">0s</span>
+        <span class="sim-stat-lbl">Attesa media</span>
+      </div>
+    </div>
   </div>
-  <div class="arch-charts-grid">
-
-    <div class="arch-chart-card">
-      <h4>Impatto stimato per funzionalità</h4>
-      <p class="sub">Riduzione % stimata rispetto a scenario base senza intervento</p>
-      <canvas id="chartImpatto" height="230"></canvas>
-    </div>
-
-    <div class="arch-chart-card">
-      <h4>Confronto costi — soluzioni di mobilità</h4>
-      <p class="sub">Costo indicativo in milioni di euro (scala logaritmica)</p>
-      <canvas id="chartCosti" height="230"></canvas>
-    </div>
-
-    <div class="arch-chart-card">
-      <h4>Allocazione budget stimata — Fase 1</h4>
-      <p class="sub">Distribuzione ipotetica del budget (~1.3 M€)</p>
-      <canvas id="chartBudget" height="230"></canvas>
-    </div>
 
   </div>
 </section>
@@ -614,6 +705,28 @@
   <div class="section-label">Analisi & Visualizzazioni</div>
   <h2>Dati</h2>
   <p class="section-desc">Dati utili al progetto — analisi interattive, dashboard e visualizzazioni prodotte durante la ricerca.</p>
+  
+  <div class="arch-charts-grid">
+
+    <div class="arch-chart-card">
+      <h4>Impatto stimato per funzionalità</h4>
+      <p class="sub">Riduzione % stimata rispetto a scenario base senza intervento</p>
+      <canvas id="chartImpatto" height="230"></canvas>
+    </div>
+
+    <div class="arch-chart-card">
+      <h4>Confronto costi — soluzioni di mobilità</h4>
+      <p class="sub">Costo indicativo in milioni di euro (scala logaritmica)</p>
+      <canvas id="chartCosti" height="230"></canvas>
+    </div>
+
+    <div class="arch-chart-card">
+      <h4>Allocazione budget stimata — Fase 1</h4>
+      <p class="sub">Distribuzione ipotetica del budget (~1.3 M€)</p>
+      <canvas id="chartBudget" height="230"></canvas>
+    </div>
+
+
   <div class="cards">
 
     <a class="card" href="dashboard_ordinanze.html" target="_blank">
@@ -1200,6 +1313,192 @@
       }
     }
   });
+
+  // ── TRAFFIC SIMULATION ──────────────────────────────────────────────────
+  (function() {
+    const canvas = document.getElementById('trafficCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const W = 800, H = 260;
+    canvas.width = W; canvas.height = H;
+
+    const ROAD_Y = H / 2, ROAD_H = 56;
+    const LIGHT_X = W * 0.52;
+    const CAR_W = 30, CAR_H = 16, STOP_GAP = 5;
+    const BASE_SPEED = 3.0;
+    const SPAWN_INTERVAL = 34;
+
+    // FIXED: rigid cycle → long queues build up
+    const FIXED_GREEN = 75, FIXED_RED = 140;
+    // ADAPTIVE: holds green while cars are waiting, very short red
+    const ADAP_RED = 28;
+
+    let adaptive = false, cars = [], passed = 0, waitTimes = [];
+    let frame = 0, greenPhase = true, phaseTimer = 0;
+    const CAR_COLORS = ['#60a5fa','#34d399','#fbbf24','#a78bfa','#f472b6','#38bdf8','#4ade80'];
+
+    function queueCount() {
+      return cars.filter(c => !c.passed && c.stopped && c.x < LIGHT_X).length;
+    }
+
+    function getGreenDuration() {
+      if (!adaptive) return FIXED_GREEN;
+      // Adaptive: keep green as long as cars are queued
+      return queueCount() > 0 ? 9999 : 40;
+    }
+    function getRedDuration() { return adaptive ? ADAP_RED : FIXED_RED; }
+
+    function spawnCar() {
+      cars.push({
+        x: -CAR_W - Math.random() * 20,
+        speed: BASE_SPEED * (0.82 + Math.random() * 0.36),
+        color: CAR_COLORS[Math.floor(Math.random() * CAR_COLORS.length)],
+        waitStart: null, passed: false, stopped: false,
+      });
+    }
+
+    function update() {
+      frame++;
+      phaseTimer++;
+
+      // Phase switching
+      const dur = greenPhase ? getGreenDuration() : getRedDuration();
+      if (phaseTimer >= dur) {
+        // Adaptive: only switch to red when queue is gone
+        const ok = adaptive && greenPhase ? queueCount() === 0 : true;
+        if (ok) { greenPhase = !greenPhase; phaseTimer = 0; }
+      }
+
+      if (frame % SPAWN_INTERVAL === 0) spawnCar();
+
+      // Sort front-to-back so we can find the car ahead easily
+      cars.sort((a, b) => b.x - a.x);
+
+      cars.forEach((c, i) => {
+        if (c.passed) return;
+
+        // Gap to car directly ahead
+        let frontX = W + 9999;
+        for (let j = 0; j < i; j++) {
+          if (!cars[j].passed) { frontX = cars[j].x; break; }
+        }
+        const gap = frontX - c.x - CAR_W;
+
+        // Must stop at red?
+        const distToLight = LIGHT_X - c.x - CAR_W;
+        const mustStop = !greenPhase && distToLight > 0 && distToLight <= c.speed + STOP_GAP + 2;
+
+        if (mustStop && gap > 0) {
+          c.x = Math.min(c.x + c.speed, LIGHT_X - CAR_W - STOP_GAP);
+          c.stopped = true;
+          if (!c.waitStart) c.waitStart = frame;
+        } else if (gap > STOP_GAP) {
+          const move = Math.min(c.speed, gap - STOP_GAP);
+          if (move > 0) {
+            c.x += move;
+            if (c.waitStart && c.x >= LIGHT_X) {
+              waitTimes.push(frame - c.waitStart);
+              c.waitStart = null;
+            }
+            c.stopped = false;
+          }
+        }
+
+        if (c.x > W + CAR_W * 2) { c.passed = true; passed++; }
+      });
+
+      if (cars.length > 100) cars = cars.filter(c => !c.passed);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Road
+      ctx.fillStyle = '#1a2030';
+      ctx.fillRect(0, ROAD_Y - ROAD_H/2, W, ROAD_H);
+      ctx.strokeStyle = 'rgba(255,255,255,0.14)'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([20,14]);
+      ctx.beginPath(); ctx.moveTo(0, ROAD_Y); ctx.lineTo(W, ROAD_Y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.28)'; ctx.lineWidth = 2;
+      [ROAD_Y - ROAD_H/2, ROAD_Y + ROAD_H/2].forEach(y => {
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+      });
+
+      // Traffic light
+      const poleTop = ROAD_Y - ROAD_H/2 - 2;
+      ctx.fillStyle = '#555';
+      ctx.fillRect(LIGHT_X - 2, poleTop - 48, 4, 48);
+      const bx = LIGHT_X - 13, by = poleTop - 72;
+      ctx.fillStyle = '#1c1c1c';
+      ctx.beginPath(); ctx.roundRect(bx, by, 26, 54, 5); ctx.fill();
+
+      ctx.fillStyle = greenPhase ? '#2a0808' : '#ef4444';
+      ctx.beginPath(); ctx.arc(LIGHT_X, by+14, 9, 0, Math.PI*2); ctx.fill();
+      if (!greenPhase) {
+        ctx.fillStyle='rgba(239,68,68,0.25)';
+        ctx.beginPath(); ctx.arc(LIGHT_X,by+14,15,0,Math.PI*2); ctx.fill();
+      }
+      ctx.fillStyle = greenPhase ? '#22c55e' : '#0f2a14';
+      ctx.beginPath(); ctx.arc(LIGHT_X, by+40, 9, 0, Math.PI*2); ctx.fill();
+      if (greenPhase) {
+        ctx.fillStyle='rgba(34,197,94,0.25)';
+        ctx.beginPath(); ctx.arc(LIGHT_X,by+40,15,0,Math.PI*2); ctx.fill();
+      }
+
+      // Cars (two lane rows)
+      let di = 0;
+      cars.forEach(c => {
+        if (c.passed) return;
+        const lane = di % 2;
+        const cy = ROAD_Y - ROAD_H/4 + lane*(ROAD_H/2) - CAR_H/2;
+        di++;
+        ctx.fillStyle = c.color;
+        ctx.beginPath(); ctx.roundRect(c.x, cy+2, CAR_W, CAR_H-4, 4); ctx.fill();
+        ctx.fillStyle='rgba(200,230,255,0.28)';
+        ctx.fillRect(c.x+CAR_W*0.55, cy+4, CAR_W*0.22, CAR_H-10);
+        ctx.fillStyle='#fef9c3';
+        ctx.fillRect(c.x+CAR_W-3, cy+4, 3, 3);
+        ctx.fillRect(c.x+CAR_W-3, cy+CAR_H-9, 3, 3);
+        if (c.stopped) {
+          ctx.fillStyle='rgba(239,68,68,0.9)';
+          ctx.fillRect(c.x, cy+4, 3, 3);
+          ctx.fillRect(c.x, cy+CAR_H-9, 3, 3);
+        }
+      });
+
+      // Mode badge
+      ctx.fillStyle = adaptive ? '#4ade80' : '#f87171';
+      ctx.font = 'bold 12px system-ui,sans-serif';
+      ctx.fillText(adaptive ? '🟢 ADATTIVO — le auto scorrono liberamente' : '🔴 CICLO FISSO — coda in formazione', 14, 20);
+
+      // Queue indicator
+      const q = queueCount();
+      if (q > 0) {
+        ctx.fillStyle='rgba(239,68,68,0.9)';
+        ctx.font='bold 11px system-ui,sans-serif';
+        ctx.fillText('coda: '+q+' auto', LIGHT_X-95, ROAD_Y-ROAD_H/2-4);
+      }
+
+      document.getElementById('statQueue').textContent  = q;
+      document.getElementById('statPassed').textContent = passed;
+      const last = waitTimes.slice(-20);
+      const avg  = last.length ? Math.round(last.reduce((a,b)=>a+b,0)/last.length/60) : 0;
+      document.getElementById('statWait').textContent   = avg+'s';
+    }
+
+    function loop() { update(); draw(); requestAnimationFrame(loop); }
+
+    window.simSetAdaptive = function(on) {
+      adaptive = on;
+      cars = []; passed = 0; waitTimes = [];
+      frame = 0; phaseTimer = 0; greenPhase = true;
+    };
+
+    loop();
+  })();
+
 </script>
 
 </body>
