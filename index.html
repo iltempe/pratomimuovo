@@ -736,31 +736,29 @@
   <h2>Dati</h2>
   <p class="section-desc">Dati utili al progetto — analisi interattive, dashboard e visualizzazioni prodotte durante la ricerca.</p>
   
-  <div class="arch-charts-grid">
+  <div class="dati-grid">
 
-    <div class="arch-chart-card">
+    <!-- riga 1: grafici di analisi -->
+    <div class="dati-card">
       <h4>Impatto stimato per funzionalità</h4>
       <p class="sub">Riduzione % stimata rispetto a scenario base senza intervento</p>
       <div class="chart-box"><canvas id="chartImpatto"></canvas></div>
     </div>
 
-    <div class="arch-chart-card">
+    <div class="dati-card">
       <h4>Confronto costi — soluzioni di mobilità</h4>
       <p class="sub">Costo indicativo in milioni di euro (scala logaritmica)</p>
       <div class="chart-box"><canvas id="chartCosti"></canvas></div>
     </div>
 
-    <div class="arch-chart-card">
+    <div class="dati-card">
       <h4>Allocazione budget stimata — Fase 1</h4>
       <p class="sub">Distribuzione ipotetica del budget (~1.3 M€)</p>
       <div class="chart-box"><canvas id="chartBudget"></canvas></div>
     </div>
 
-  </div><!-- /arch-charts-grid -->
-
-  <div class="cards" style="margin-top:2.5rem;">
-
-    <a class="card" href="dashboard_ordinanze.html" target="_blank">
+    <!-- riga 2: dashboard e monitoraggi -->
+    <a class="dati-card dati-card-link" href="dashboard_ordinanze.html" target="_blank">
       <div class="card-icon cyan">📊</div>
       <div>
         <h3>Dashboard Ordinanze</h3>
@@ -769,7 +767,7 @@
       <p>Visualizzazione interattiva di 10.000+ ordinanze di viabilità del Comune di Prato (2004-2026). Trend, top vie, heatmap.</p>
     </a>
 
-    <a class="card" href="https://iltempe.github.io/pratomimuovo-traffico/" target="_blank">
+    <a class="dati-card dati-card-link" href="https://iltempe.github.io/pratomimuovo-traffico/" target="_blank">
       <div class="card-icon green">🚦</div>
       <div>
         <h3>Monitoraggio Soccorso</h3>
@@ -778,22 +776,13 @@
       <p>Monitoraggio della velocità dei veicoli al Sottopasso del Soccorso — dati aggiornati in tempo reale sull'asse Declassata di Prato.</p>
     </a>
 
-    <a class="card" href="https://iltempe.github.io/pratomimuovo_incidenti/" target="_blank">
+    <a class="dati-card dati-card-link" href="https://iltempe.github.io/pratomimuovo_incidenti/" target="_blank">
       <div class="card-icon violet">🚨</div>
       <div>
         <h3>Dati Incidenti Prato</h3>
         <span class="card-badge badge-html">Web</span>
       </div>
       <p>Analisi e visualizzazione degli incidenti stradali nel territorio pratese — dati georeferenziati.</p>
-    </a>
-
-    <a class="card" href="grafici_substack_embed.html" target="_blank">
-      <div class="card-icon orange">📈</div>
-      <div>
-        <h3>Grafici Ordinanze</h3>
-        <span class="card-badge badge-html">HTML</span>
-      </div>
-      <p>Versione ottimizzata dei grafici sulle ordinanze, pensata per l'embedding su Substack.</p>
     </a>
 
   </div>
@@ -1346,71 +1335,72 @@
     }
   });
 
-  // ── TRAFFIC SIMULATION (simplified) ────────────────────────────────────
+  // ── TRAFFIC SIMULATION ──────────────────────────────────────────────────
   (function() {
     const canvas = document.getElementById('trafficCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const W = 720, H = 180;
+    // ── Layout ──────────────────────────────────────────────────────────
+    const W = 720, H = 260;
     canvas.width = W; canvas.height = H;
 
-    // Road geometry
-    const RY = H / 2;       // road centre Y
-    const RH = 48;           // road height
-    const LX = W * 0.5;     // traffic light X
-    const CW = 32, CH = 14; // car width, height
-    const GAP = 6;           // min gap between cars
+    const RY  = 200;          // road centre Y (lower = more room above for signals)
+    const RH  = 46;           // road height
+    const LX  = W * 0.52;    // traffic light X
+    const CW  = 30, CH = 14; // car dimensions
+    const GAP = 6;
 
-    // Timing (frames @ ~60fps)
+    const ROAD_TOP = RY - RH / 2;   // 177
+    const BRAIN_X  = LX;
+    const BRAIN_Y  = 36;             // brain icon centre Y (top area)
+
+    // Traffic light box top
+    const POLE_H   = ROAD_TOP - 2;  // pole top = 175
+    const BY       = POLE_H - 74;   // light box top Y = 101
+
+    // ── Timing ──────────────────────────────────────────────────────────
+    // Fixed: short green, long red → queue builds dramatically
+    const FIXED_GREEN = 62, FIXED_RED = 160;
+    // Adaptive: hold green while queued, blink-length red
+    const ADAP_RED = 20;
+    const SPAWN_INT = 40;       // frames between car spawns (same both modes)
+    const BASE_SPEED = 1.75;   // px/frame — slow enough to see queuing
+
     let adaptive = false;
-    const FIXED_GREEN = 80, FIXED_RED = 130;
-    const ADAP_RED    = 22;   // very short red in adaptive mode
-
     let cars = [], passed = 0, totalWait = 0, waitCount = 0;
     let frame = 0, green = true, timer = 0;
-    const COLORS = ['#60a5fa','#34d399','#fbbf24','#a78bfa','#f472b6'];
+    const COLORS = ['#60a5fa','#34d399','#fbbf24','#a78bfa','#f472b6','#38bdf8','#fb923c'];
 
-    function queued() {
-      return cars.filter(c => !c.done && c.stopped).length;
-    }
-    function greenDur() {
-      if (!adaptive) return FIXED_GREEN;
-      return queued() > 0 ? 9999 : 45; // hold green while cars wait
-    }
-    function redDur() { return adaptive ? ADAP_RED : FIXED_RED; }
+    // ── State helpers ────────────────────────────────────────────────────
+    function queued() { return cars.filter(c => !c.done && c.stopped).length; }
+    function greenDur() { return adaptive ? (queued() > 0 ? 9999 : 40) : FIXED_GREEN; }
+    function redDur()   { return adaptive ? ADAP_RED : FIXED_RED; }
 
+    // ── Tick ─────────────────────────────────────────────────────────────
     function tick() {
       frame++;
       timer++;
       const dur = green ? greenDur() : redDur();
       if (timer >= dur) {
-        if (adaptive && green && queued() > 0) { /* hold */ }
-        else { green = !green; timer = 0; }
+        if (!(adaptive && green && queued() > 0)) { green = !green; timer = 0; }
       }
-      // Spawn one car every ~36 frames
-      if (frame % 36 === 0) {
-        cars.push({ x: -CW, speed: 2.8 + Math.random()*1.2,
-          color: COLORS[frame/36%COLORS.length|0],
-          waitStart: 0, stopped: false, done: false });
+      if (frame % SPAWN_INT === 0) {
+        const idx = Math.floor(frame / SPAWN_INT) % COLORS.length;
+        cars.push({ x: -CW - Math.random()*10, speed: BASE_SPEED * (0.85 + Math.random()*0.3),
+                    color: COLORS[idx], waitStart: 0, stopped: false, done: false });
       }
 
-      // Move cars (process back-to-front to avoid collisions)
-      // Sort ascending x = back-to-front
-      cars.sort((a,b) => a.x - b.x);
+      cars.sort((a, b) => a.x - b.x); // back-to-front order
 
       for (let i = 0; i < cars.length; i++) {
         const c = cars[i];
         if (c.done) continue;
-
-        // Gap to car ahead (next car with higher x)
         let frontX = W + 9999;
         for (let j = i + 1; j < cars.length; j++) {
           if (!cars[j].done) { frontX = cars[j].x; break; }
         }
-        const freeGap = frontX - c.x - CW;
-
-        // Must stop at red?
+        const freeGap   = frontX - c.x - CW;
         const distLight = LX - c.x - CW;
         const mustStop  = !green && distLight > 0 && distLight <= c.speed + GAP + 1;
 
@@ -1418,97 +1408,207 @@
           c.x = Math.min(c.x + c.speed, LX - CW - GAP);
           if (!c.stopped) { c.stopped = true; c.waitStart = frame; }
         } else if (freeGap > GAP) {
-          c.x += Math.min(c.speed, freeGap - GAP);
-          if (c.stopped && c.x >= LX) {
-            totalWait += frame - c.waitStart;
-            waitCount++;
-            c.stopped = false;
+          const mv = Math.min(c.speed, freeGap - GAP);
+          if (mv > 0) {
+            c.x += mv;
+            if (c.stopped && c.x >= LX) {
+              totalWait += frame - c.waitStart; waitCount++; c.stopped = false;
+            }
           }
         }
         if (c.x > W + CW) c.done = true;
       }
-
-      if (cars.length > 80) cars = cars.filter(c => !c.done);
+      if (cars.length > 90) cars = cars.filter(c => !c.done);
     }
 
+    // ── Draw helpers ─────────────────────────────────────────────────────
+    function drawEye(x, y) {
+      // White sclera
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.beginPath(); ctx.ellipse(x, y, 7, 4.5, 0, 0, Math.PI*2); ctx.fill();
+      // Iris (indigo)
+      ctx.fillStyle = '#6366f1';
+      ctx.beginPath(); ctx.arc(x, y, 2.8, 0, Math.PI*2); ctx.fill();
+      // Pupil
+      ctx.fillStyle = '#0d0f18';
+      ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI*2); ctx.fill();
+      // Gleam
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.beginPath(); ctx.arc(x-1, y-1, 0.8, 0, Math.PI*2); ctx.fill();
+      // Outline
+      ctx.strokeStyle = 'rgba(200,210,255,0.6)'; ctx.lineWidth = 0.6;
+      ctx.beginPath(); ctx.ellipse(x, y, 7, 4.5, 0, 0, Math.PI*2); ctx.stroke();
+    }
+
+    function drawBrain(x, y, active) {
+      // Outer glow when active
+      if (active) {
+        const g = ctx.createRadialGradient(x, y, 0, x, y, 46);
+        g.addColorStop(0, 'rgba(99,102,241,0.35)');
+        g.addColorStop(1, 'rgba(99,102,241,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x, y, 46, 0, Math.PI*2); ctx.fill();
+      }
+      // Background circle
+      ctx.fillStyle = active ? 'rgba(60,63,130,0.55)' : 'rgba(22,24,46,0.7)';
+      ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = active ? '#818cf8' : 'rgba(99,102,241,0.3)';
+      ctx.lineWidth = active ? 2 : 1.2;
+      ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI*2); ctx.stroke();
+      // Brain emoji
+      ctx.font = '22px serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('🧠', x, y + 1);
+      ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+      // "IA" label
+      if (active) {
+        ctx.font = 'bold 9px system-ui,sans-serif';
+        ctx.fillStyle = '#a5b4fc';
+        ctx.textAlign = 'center';
+        ctx.fillText('IA', x, y + 35);
+        ctx.textAlign = 'left';
+      }
+    }
+
+    function drawSignalLines(q) {
+      // Animated dashed lines: eye → brain
+      const dashSpeed = 1.5;
+      const visCars = cars.filter(c => !c.done && c.x > -CW && c.x < W);
+
+      visCars.forEach(c => {
+        const ex = c.x + CW * 0.5;
+        const ey = ROAD_TOP - 11;   // just above road surface
+
+        // Line from eye → brain bottom
+        ctx.save();
+        ctx.strokeStyle = 'rgba(99,102,241,0.28)';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([5, 7]);
+        ctx.lineDashOffset = -(frame * dashSpeed) % 12;
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.quadraticCurveTo(ex + (BRAIN_X - ex) * 0.3, ey - 30, BRAIN_X, BRAIN_Y + 22);
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // Brain → traffic light (active only if brain is deciding)
+      const deciding = q > 0 || timer < 8;
+      if (deciding) {
+        const lightMid = BY + 26; // mid of light box
+        ctx.save();
+        ctx.strokeStyle = green ? 'rgba(34,197,94,0.7)' : 'rgba(239,68,68,0.6)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 5]);
+        ctx.lineDashOffset = -(frame * 2.0) % 11;
+        ctx.beginPath();
+        ctx.moveTo(BRAIN_X, BRAIN_Y + 22);
+        ctx.lineTo(LX, lightMid);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // ── Render ───────────────────────────────────────────────────────────
     function render() {
       ctx.clearRect(0, 0, W, H);
 
-      // Road background
-      ctx.fillStyle = '#1a2030';
-      ctx.fillRect(0, RY - RH/2, W, RH);
+      // Signal layer (drawn first, under everything)
+      if (adaptive) drawSignalLines(queued());
 
-      // Dashed centre line
-      ctx.strokeStyle = 'rgba(255,255,255,0.13)';
-      ctx.lineWidth = 1.5; ctx.setLineDash([18,12]);
+      // ── Road ──
+      ctx.fillStyle = '#1a2030';
+      ctx.fillRect(0, ROAD_TOP, W, RH);
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([20, 14]);
       ctx.beginPath(); ctx.moveTo(0, RY); ctx.lineTo(W, RY); ctx.stroke();
       ctx.setLineDash([]);
-
-      // Road edges
-      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2;
-      [RY-RH/2, RY+RH/2].forEach(y=>{
-        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.28)'; ctx.lineWidth = 2;
+      [ROAD_TOP, ROAD_TOP + RH].forEach(y => {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
       });
 
       // ── Traffic light ──
       ctx.fillStyle = '#555';
-      ctx.fillRect(LX - 2, RY - RH/2 - 44, 4, 44);
-
-      const bx = LX-11, by = RY-RH/2-62;
+      ctx.fillRect(LX - 2, BY + 46, 4, POLE_H - (BY + 46));
       ctx.fillStyle = '#1c1c1c';
-      ctx.beginPath(); ctx.roundRect(bx, by, 22, 46, 4); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(LX - 13, BY, 26, 52, 5); ctx.fill();
 
-      // Red dot
-      ctx.fillStyle = green ? '#2a0a0a' : '#ef4444';
-      ctx.beginPath(); ctx.arc(LX, by+12, 7, 0, Math.PI*2); ctx.fill();
-      // Green dot
+      // Red lamp
+      ctx.fillStyle = green ? '#2a0808' : '#ef4444';
+      ctx.beginPath(); ctx.arc(LX, BY + 14, 9, 0, Math.PI * 2); ctx.fill();
+      if (!green) {
+        ctx.fillStyle = 'rgba(239,68,68,0.22)';
+        ctx.beginPath(); ctx.arc(LX, BY + 14, 16, 0, Math.PI * 2); ctx.fill();
+      }
+      // Green lamp
       ctx.fillStyle = green ? '#22c55e' : '#0a200f';
-      ctx.beginPath(); ctx.arc(LX, by+34, 7, 0, Math.PI*2); ctx.fill();
-      // Glow
+      ctx.beginPath(); ctx.arc(LX, BY + 38, 9, 0, Math.PI * 2); ctx.fill();
       if (green) {
-        ctx.fillStyle='rgba(34,197,94,0.2)';
-        ctx.beginPath(); ctx.arc(LX,by+34,13,0,Math.PI*2); ctx.fill();
-      } else {
-        ctx.fillStyle='rgba(239,68,68,0.2)';
-        ctx.beginPath(); ctx.arc(LX,by+12,13,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = 'rgba(34,197,94,0.22)';
+        ctx.beginPath(); ctx.arc(LX, BY + 38, 16, 0, Math.PI * 2); ctx.fill();
       }
 
       // ── Cars ──
       cars.forEach(c => {
         if (c.done) return;
-        const cy = RY - CH/2;
+        const cy = RY - CH / 2;
         ctx.fillStyle = c.color;
-        ctx.beginPath(); ctx.roundRect(c.x, cy, CW, CH, 3); ctx.fill();
-        // Windshield
-        ctx.fillStyle = 'rgba(180,220,255,0.3)';
-        ctx.fillRect(c.x + CW*0.55, cy+2, CW*0.2, CH-4);
-        // Brake lights
+        ctx.beginPath(); ctx.roundRect(c.x, cy, CW, CH, 4); ctx.fill();
+        ctx.fillStyle = 'rgba(200,230,255,0.28)';
+        ctx.fillRect(c.x + CW * 0.56, cy + 2, CW * 0.2, CH - 4);
+        ctx.fillStyle = '#fef9c3';
+        ctx.fillRect(c.x + CW - 3, cy + 3, 3, 3);
+        ctx.fillRect(c.x + CW - 3, cy + CH - 6, 3, 3);
         if (c.stopped) {
-          ctx.fillStyle = '#ef4444';
-          ctx.fillRect(c.x, cy+2, 3, 4);
-          ctx.fillRect(c.x, cy+CH-6, 3, 4);
+          ctx.fillStyle = 'rgba(239,68,68,0.9)';
+          ctx.fillRect(c.x, cy + 3, 3, 3);
+          ctx.fillRect(c.x, cy + CH - 6, 3, 3);
         }
       });
 
-      // ── Mode label ──
-      ctx.font = 'bold 12px system-ui,sans-serif';
-      ctx.fillStyle = adaptive ? '#4ade80' : '#f87171';
-      ctx.fillText(adaptive
-        ? '🟢 ADATTIVO: verde finché ci sono auto — scorrimento libero'
-        : '🔴 CICLO FISSO: rosso indipendente dalla coda', 10, 18);
+      // ── Eyes (adaptive only, drawn above cars) ──
+      if (adaptive) {
+        cars.forEach(c => {
+          if (c.done || c.x < -CW || c.x > W) return;
+          drawEye(c.x + CW * 0.5, ROAD_TOP - 11);
+        });
+      }
 
-      // Queue label
+      // ── Brain (adaptive only, top area) ──
+      if (adaptive) {
+        drawBrain(BRAIN_X, BRAIN_Y, queued() > 0 || timer < 12);
+      }
+
+      // ── Mode label ──
+      ctx.font = 'bold 11px system-ui,sans-serif';
+      ctx.fillStyle = adaptive ? '#4ade80' : '#f87171';
+      ctx.fillText(
+        adaptive ? '🟢 ADATTIVO — i sensori guidano il semaforo' : '🔴 CICLO FISSO — semaforo indipendente dalla coda',
+        10, 18
+      );
+
+      // ── Queue label ──
       const q = queued();
       if (q > 0) {
         ctx.fillStyle = 'rgba(239,68,68,0.9)';
-        ctx.font = 'bold 11px system-ui,sans-serif';
-        ctx.fillText('↑ coda: '+q, LX-60, RY-RH/2-2);
+        ctx.font = 'bold 10px system-ui,sans-serif';
+        ctx.fillText('coda: ' + q + ' auto', LX - 70, ROAD_TOP - 2);
       }
 
-      // Stats
+      // ── Phase countdown (fixed mode only — shows how long until green) ──
+      if (!adaptive && !green) {
+        const remain = Math.max(0, FIXED_RED - timer);
+        const secs   = (remain / 60).toFixed(1);
+        ctx.fillStyle = 'rgba(239,68,68,0.7)';
+        ctx.font = '10px system-ui,sans-serif';
+        ctx.fillText('🔴 rosso ancora ~' + secs + 's', LX + 18, BY + 14);
+      }
+
+      // ── Stats ──
       document.getElementById('statQueue').textContent  = q;
-      document.getElementById('statPassed').textContent = passed + cars.filter(c=>c.done).length;
-      const avg = waitCount ? Math.round(totalWait/waitCount/60) : 0;
+      document.getElementById('statPassed').textContent = passed + cars.filter(c => c.done).length;
+      const avg = waitCount ? Math.round(totalWait / waitCount / 60) : 0;
       document.getElementById('statWait').textContent   = avg + 's';
     }
 
