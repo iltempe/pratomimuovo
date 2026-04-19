@@ -382,6 +382,7 @@
     .arch-chart-card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: 12px; padding: 1.25rem 1.5rem;
+      min-width: 0; overflow: hidden;   /* prevent grid blowout on resize */
     }
     .arch-chart-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
     .arch-chart-card .sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; }
@@ -1375,7 +1376,7 @@
     const SPAWN_INT  = 52;   // frames between car spawns within a batch
     const BASE_SPEED = 1.1;  // px/frame — slow enough to see queuing
     const BATCH_SIZE = 15;   // cars per wave
-    const BATCH_PAUSE = 320; // frames of quiet between waves (~5 s @ 60 fps)
+    const BATCH_PAUSE = 800; // frames of quiet between waves (~13 s @ 60 fps)
 
     let adaptive = false;
     let cars = [], passed = 0, totalWait = 0, waitCount = 0;
@@ -1385,9 +1386,17 @@
 
     // ── State helpers ────────────────────────────────────────────────────
     function queued()    { return cars.filter(c => !c.done && c.stopped).length; }
-    function anyCar()    { return cars.some(c => !c.done); }
-    // Adaptive: stay green while ANY car is on screen; only cycle during batch pause
-    function greenDur()  { return adaptive ? (anyCar() ? 9999 : 40) : FIXED_GREEN; }
+    // True only once ALL spawned cars have cleared the stop-line (x > LX+CW)
+    function allClearedLight() {
+      return !cars.some(c => !c.done && c.x <= LX + CW);
+    }
+    // Adaptive: green while batch active OR cars still en-route to/at light;
+    //           allow brief red only when pausing AND last car has cleared.
+    function greenDur()  {
+      if (!adaptive) return FIXED_GREEN;
+      if (!batchPausing || !allClearedLight()) return 9999;
+      return 40; // batch done + intersection clear → allow red
+    }
     function redDur()    { return adaptive ? ADAP_RED : FIXED_RED; }
 
     // ── Tick ─────────────────────────────────────────────────────────────
@@ -1396,7 +1405,7 @@
       timer++;
       const dur = green ? greenDur() : redDur();
       if (timer >= dur) {
-        if (!(adaptive && green && anyCar())) { green = !green; timer = 0; }
+        if (!(adaptive && green && !allClearedLight())) { green = !green; timer = 0; }
       }
       // ── Batch spawn ──────────────────────────────────────────────────────
       if (!batchPausing) {
