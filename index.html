@@ -166,8 +166,8 @@
     }
 
     /* ── CARDS GRID ── */
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
-    @media (max-width: 480px) { .cards { grid-template-columns: 1fr; } }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+    @media (max-width: 600px) { .cards { grid-template-columns: 1fr; gap: 1rem; } }
     .card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: 12px; padding: 1.5rem;
@@ -186,7 +186,7 @@
     .card-icon.violet { background: rgba(168,85,247,0.15); }
     .card-icon.green  { background: rgba(16,185,129,0.15); }
     .card-icon.orange { background: rgba(245,158,11,0.15); }
-    .card h3 { font-size: 1rem; font-weight: 600; }
+    .card h3 { font-size: 0.95rem; font-weight: 600; line-height: 1.35; }
     .card p { font-size: 0.85rem; color: var(--text-muted); flex: 1; }
     .card-badge {
       display: inline-block; font-size: 0.7rem; font-weight: 600;
@@ -363,9 +363,10 @@
     .arch-charts-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
+      gap: 1.5rem;
     }
-    @media (max-width: 768px) { .arch-charts-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .arch-charts-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .arch-charts-grid { grid-template-columns: 1fr; } }
     .arch-chart-card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: 12px; padding: 1.25rem 1.5rem;
@@ -476,31 +477,43 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* ── MOBILE ── */
-    @media (max-width: 768px) {
+    /* ── RESPONSIVE ── */
+
+    /* Tablet (≤ 900px) */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-image-wrap { order: -1; max-width: 400px; margin: 0 auto; }
+      .social-grid { grid-template-columns: repeat(2, 1fr); }
+      .ambassador-wrap { grid-template-columns: 1fr; }
+    }
+
+    /* Mobile (≤ 600px) */
+    @media (max-width: 600px) {
       nav { padding: 0 1rem; }
       .nav-links { display: none; }
-      section { padding: 3rem 1.25rem; }
-      h2 { font-size: 1.6rem; }
-      .hero-subtitle { font-size: 1rem; }
+      section { padding: 2.5rem 1rem; }
+      h1 { font-size: clamp(1.8rem, 7vw, 3rem); }
+      h2 { font-size: 1.5rem; }
+      .section-label { font-size: 0.7rem; }
+      .hero-subtitle { font-size: 0.95rem; }
       .hero-pills { gap: 0.5rem; }
-      .pill { font-size: 0.78rem; padding: 0.35rem 0.7rem; }
+      .pill { font-size: 0.75rem; padding: 0.3rem 0.65rem; }
+      .hero-cta { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
       .features-grid { grid-template-columns: 1fr; gap: 0.75rem; }
-      .flow-wrap { grid-template-columns: 1fr !important; }
+      .flow-wrap { grid-template-columns: 1fr !important; gap: 0.5rem; }
+      .flow-connector { display: none; }
       .traffic-sim-section { padding: 1.25rem 1rem; }
+      .sim-toggle-row { flex-wrap: wrap; gap: 0.5rem; }
       .sim-stats-row { gap: 0.75rem; }
-      .sim-stat { min-width: 80px; padding: 0.6rem 0.75rem; }
+      .sim-stat { min-width: 80px; padding: 0.6rem 0.75rem; flex: 1; }
       .sim-stat-val { font-size: 1.2rem; }
+      .arch-chart-card { padding: 1rem; }
       .social-grid { grid-template-columns: 1fr; }
       .share-btn { font-size: 0.82rem; padding: 0.7rem 1rem; }
-      .arch-chart-card { padding: 1rem; }
-      .doc-grid { grid-template-columns: 1fr !important; }
-    }
-    @media (max-width: 480px) {
-      .hero-cta { flex-direction: column; align-items: flex-start; }
-      .ambassador-logo { width: 110px; }
-      .sim-toggle-row { flex-wrap: wrap; gap: 0.5rem; }
-      h1 { font-size: clamp(1.9rem, 8vw, 3.5rem); }
+      .ambassador-logo { width: 100px; }
+      .obj-selector { gap: 0.4rem; }
+      .obj-btn { font-size: 0.78rem; padding: 0.4rem 0.75rem; }
+      .flow-step { padding: 1rem; }
     }
   </style>
 </head>
